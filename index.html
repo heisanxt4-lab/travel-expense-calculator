@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外旅費計算ツール</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --accent: #0ea5e9;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+    --shadow: 0 4px 24px rgba(37,99,235,0.08);
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0ea5e9 100%);
+    border-radius: var(--radius);
+    padding: 32px 28px 28px;
+    margin-bottom: 24px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(37,99,235,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '✈️';
+    position: absolute;
+    right: 24px;
+    top: 20px;
+    font-size: 64px;
+    opacity: 0.15;
+    transform: rotate(-15deg);
+  }
+  .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .header p { font-size: 14px; opacity: 0.8; margin-top: 6px; }
+
+  /* ── Settings bar ── */
+  .settings-bar {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+    box-shadow: var(--shadow);
+  }
+  .settings-bar .field { display: flex; flex-direction: column; gap: 6px; }
+  .settings-bar label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .settings-bar select, .settings-bar input[type="text"] {
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 160px;
+  }
+  .settings-bar select:focus, .settings-bar input:focus { outline: none; border-color: var(--primary); }
+
+  .rate-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-left: auto;
+    padding: 8px 14px;
+    background: var(--bg);
+    border-radius: 10px;
+  }
+  .rate-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+  .rate-dot.loading { background: var(--warning); animation: pulse 1s infinite; }
+  .rate-dot.ok { background: var(--success); }
+  .rate-dot.error { background: var(--danger); }
+
+  /* ── Country Cards ── */
+  .countries { display: flex; flex-direction: column; gap: 20px; }
+
+  .country-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .country-card:focus-within { border-color: var(--accent); }
+
+  .country-header {
+    background: linear-gradient(90deg, #f8fafc 0%, #e0f2fe 100%);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .country-emoji { font-size: 28px; cursor: pointer; }
+  .country-name-input {
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    flex: 1;
+    min-width: 120px;
+  }
+  .country-name-input:focus { outline: none; }
+
+  .currency-select {
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    background: white;
+    color: var(--primary);
+    cursor: pointer;
+    min-width: 120px;
+  }
+  .currency-select:focus { outline: none; border-color: var(--primary); }
+
+  .country-rate {
+    font-size: 12px;
+    color: var(--muted);
+    background: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .btn-remove-country {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 20px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-remove-country:hover { background: #fee2e2; color: var(--danger); }
+
+  /* ── Expense table ── */
+  .expense-table { width: 100%; padding: 16px 20px; }
+
+  .expense-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 160px 120px 40px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 680px) {
+    .expense-row {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+    }
+    .expense-row .col-amount { grid-column: 1; }
+    .expense-row .col-converted { grid-column: 2; }
+    .expense-row .col-delete { grid-column: 2; justify-self: end; }
+  }
+
+  .expense-row input, .expense-row select {
+    padding: 9px 12px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+  .expense-row input:focus, .expense-row select:focus { outline: none; border-color: var(--primary); }
+
+  .converted-amount {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    text-align: right;
+    padding-right: 4px;
+  }
+
+  .btn-del-row {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-del-row:hover { background: #fee2e2; color: var(--danger); }
+
+  .expense-table-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 160px 120px 40px;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 0 2px;
+  }
+  .col-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  @media (max-width: 680px) {
+    .expense-table-header { display: none; }
+  }
+
+  .country-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .btn-add-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    background: none;
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-add-row:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+
+  .country-subtotal {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+    background: #eff6ff;
+    padding: 8px 16px;
+    border-radius: 10px;
+  }
+  .country-subtotal span { color: var(--muted); font-weight: 400; font-size: 13px; margin-right: 4px; }
+
+  /* ── Add country button ── */
+  .btn-add-country {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 18px;
+    background: none;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .btn-add-country:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+
+  /* ── Summary panel ── */
+  .summary-panel {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-top: 28px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(37,99,235,0.3);
+  }
+  .summary-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; opacity: 0.9; }
+  .summary-rows { display: flex; flex-direction: column; gap: 10px; }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 18px;
+  }
+  .summary-row .label { font-size: 14px; opacity: 0.85; }
+  .summary-row .amount { font-size: 16px; font-weight: 700; }
+  .summary-total {
+    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-top: 12px;
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .summary-total .label { font-size: 16px; font-weight: 600; }
+  .summary-total .amount { font-size: 28px; font-weight: 800; }
+
+  .budget-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); }
+  .budget-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .budget-label { font-size: 14px; opacity: 0.85; white-space: nowrap; }
+  .budget-input {
+    padding: 10px 14px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    width: 160px;
+  }
+  .budget-input::placeholder { color: rgba(255,255,255,0.5); }
+  .budget-input:focus { outline: none; border-color: white; }
+  .budget-status {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+  }
+  .budget-status.over { background: rgba(239,68,68,0.35); }
+  .budget-status.ok { background: rgba(16,185,129,0.35); }
+
+  /* ── Category badge ── */
+  .CATEGORY_COLORS { display: none; }
+
+  /* ── Animations ── */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @keyframes slideIn {
+    from { opacity:0; transform:translateY(-12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .country-card { animation: slideIn 0.25s ease; }
+
+  /* ── Misc ── */
+  .no-countries {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 15px;
+  }
+
+  .refresh-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px;
+    line-height: 1;
+    transition: transform 0.4s;
+  }
+  .refresh-btn:hover { transform: rotate(180deg); }
+  .refresh-btn.spinning { animation: spin 1s linear; }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✈️ 海外旅費計算ツール</h1>
+  <p>複数の国を旅するときの費用を一括管理＆最新レートで自動換算</p>
+</div>
+
+<div class="settings-bar">
+  <div class="field">
+    <label>基準通貨（合計表示）</label>
+    <select id="baseCurrency" onchange="recalcAll()">
+      <option value="JPY" selected>🇯🇵 JPY – 日本円</option>
+      <option value="USD">🇺🇸 USD – 米ドル</option>
+      <option value="EUR">🇪🇺 EUR – ユーロ</option>
+      <option value="GBP">🇬🇧 GBP – 英ポンド</option>
+      <option value="AUD">🇦🇺 AUD – 豪ドル</option>
+      <option value="CAD">🇨🇦 CAD – カナダドル</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>旅行名・メモ</label>
+    <input type="text" id="tripName" placeholder="例：ヨーロッパ一周 2025夏" style="min-width:220px">
+  </div>
+  <div class="rate-status" id="rateStatus">
+    <div class="rate-dot loading" id="rateDot"></div>
+    <span id="rateStatusText">レート取得中…</span>
+    <button class="refresh-btn" id="refreshBtn" onclick="fetchRates()" title="レートを更新">🔄</button>
+  </div>
+</div>
+
+<div class="countries" id="countriesContainer"></div>
+<div id="noCountries" class="no-countries" style="display:none">
+  国を追加してください 👇
+</div>
+
+<button class="btn-add-country" onclick="addCountry()">
+  ＋ 国を追加する
+</button>
+
+<div class="summary-panel" id="summaryPanel" style="display:none">
+  <h2>📊 旅費サマリー</h2>
+  <div class="summary-rows" id="summaryRows"></div>
+  <div class="summary-total">
+    <span class="label">✈️ 合計</span>
+    <span class="amount" id="grandTotal">—</span>
+  </div>
+  <div class="budget-section">
+    <div class="budget-row">
+      <span class="budget-label">予算上限：</span>
+      <input class="budget-input" type="number" id="budgetInput" placeholder="例: 300000" oninput="updateBudgetStatus()">
+      <span class="budget-status" id="budgetStatus" style="display:none"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ────────── DATA ──────────
+const CURRENCIES = {
+  JPY:{ name:'日本円',       symbol:'¥',  flag:'🇯🇵' },
+  USD:{ name:'米ドル',       symbol:'$',  flag:'🇺🇸' },
+  EUR:{ name:'ユーロ',       symbol:'€',  flag:'🇪🇺' },
+  GBP:{ name:'英ポンド',     symbol:'£',  flag:'🇬🇧' },
+  AUD:{ name:'豪ドル',       symbol:'A$', flag:'🇦🇺' },
+  CAD:{ name:'カナダドル',   symbol:'C$', flag:'🇨🇦' },
+  CHF:{ name:'スイスフラン', symbol:'Fr', flag:'🇨🇭' },
+  HKD:{ name:'香港ドル',     symbol:'HK$',flag:'🇭🇰' },
+  SGD:{ name:'シンガポール$',symbol:'S$', flag:'🇸🇬' },
+  KRW:{ name:'韓国ウォン',   symbol:'₩',  flag:'🇰🇷' },
+  CNY:{ name:'人民元',       symbol:'¥',  flag:'🇨🇳' },
+  TWD:{ name:'台湾ドル',     symbol:'NT$',flag:'🇹🇼' },
+  THB:{ name:'タイバーツ',   symbol:'฿',  flag:'🇹🇭' },
+  IDR:{ name:'インドネシアルピア',symbol:'Rp',flag:'🇮🇩' },
+  MYR:{ name:'マレーシアリンギット',symbol:'RM',flag:'🇲🇾' },
+  PHP:{ name:'フィリピンペソ',symbol:'₱', flag:'🇵🇭' },
+  VND:{ name:'ベトナムドン', symbol:'₫',  flag:'🇻🇳' },
+  INR:{ name:'インドルピー', symbol:'₹',  flag:'🇮🇳' },
+  TRY:{ name:'トルコリラ',   symbol:'₺',  flag:'🇹🇷' },
+  MXN:{ name:'メキシコペソ', symbol:'$',  flag:'🇲🇽' },
+  BRL:{ name:'ブラジルレアル',symbol:'R$',flag:'🇧🇷' },
+  ZAR:{ name:'南アフリカランド',symbol:'R',flag:'🇿🇦' },
+  SEK:{ name:'スウェーデンクローナ',symbol:'kr',flag:'🇸🇪' },
+  NOK:{ name:'ノルウェークローネ',symbol:'kr',flag:'🇳🇴' },
+  DKK:{ name:'デンマーククローネ',symbol:'kr',flag:'🇩🇰' },
+  NZD:{ name:'ニュージーランドドル',symbol:'NZ$',flag:'🇳🇿' },
+  AED:{ name:'UAEディルハム',symbol:'د.إ',flag:'🇦🇪' },
+  SAR:{ name:'サウジリヤル', symbol:'﷼', flag:'🇸🇦' },
+  ILS:{ name:'イスラエルシェケル',symbol:'₪',flag:'🇮🇱' },
+  PLN:{ name:'ポーランドズロチ',symbol:'zł',flag:'🇵🇱' },
+  CZK:{ name:'チェココルナ', symbol:'Kč',flag:'🇨🇿' },
+  HUF:{ name:'ハンガリーフォリント',symbol:'Ft',flag:'🇭🇺' },
+};
+
+const CATEGORIES = [
+  { value:'flight',   label:'✈️ 航空券' },
+  { value:'hotel',    label:'🏨 ホテル' },
+  { value:'food',     label:'🍜 食事' },
+  { value:'transport',label:'🚇 交通' },
+  { value:'shopping', label:'🛍️ ショッピング' },
+  { value:'activity', label:'🎡 アクティビティ' },
+  { value:'entrance', label:'🎫 入場料' },
+  { value:'tip',      label:'💵 チップ' },
+  { value:'other',    label:'📝 その他' },
+];
+
+const COUNTRY_PRESETS = [
+  { name:'アメリカ',     currency:'USD', emoji:'🇺🇸' },
+  { name:'フランス',     currency:'EUR', emoji:'🇫🇷' },
+  { name:'イギリス',     currency:'GBP', emoji:'🇬🇧' },
+  { name:'オーストラリア',currency:'AUD', emoji:'🇦🇺' },
+  { name:'韓国',         currency:'KRW', emoji:'🇰🇷' },
+  { name:'台湾',         currency:'TWD', emoji:'🇹🇼' },
+  { name:'タイ',         currency:'THB', emoji:'🇹🇭' },
+  { name:'シンガポール', currency:'SGD', emoji:'🇸🇬' },
+  { name:'香港',         currency:'HKD', emoji:'🇭🇰' },
+  { name:'イタリア',     currency:'EUR', emoji:'🇮🇹' },
+];
+
+let rates = {};       // { "USD": rate_in_EUR, ... } (base = EUR from API)
+let rateBase = 'EUR'; // frankfurter always returns EUR as base
+let rateDate = '';
+let countries = [];   // { id, name, currency, emoji, expenses:[] }
+let nextId = 1;
+
+// ────────── FETCH RATES ──────────
+async function fetchRates() {
+  setRateStatus('loading', 'レート取得中…');
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  try {
+    const res = await fetch('https://api.frankfurter.app/latest');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    // data.base = 'EUR', data.rates = { USD:..., JPY:..., ... }
+    rates = { ...data.rates, EUR: 1 }; // add EUR itself
+    rateBase = 'EUR';
+    rateDate = data.date;
+    setRateStatus('ok', `更新済み（${rateDate}）`);
+  } catch(e) {
+    setRateStatus('error', 'レート取得失敗 – オフライン換算');
+    // fallback approximate rates (vs EUR)
+    rates = {
+      EUR:1, USD:1.08, JPY:164, GBP:0.86, AUD:1.67, CAD:1.47,
+      CHF:0.97, HKD:8.43, SGD:1.46, KRW:1450, CNY:7.82, TWD:34.8,
+      THB:38.5, IDR:17200, MYR:5.06, PHP:60.5, VND:27200, INR:90.5,
+      TRY:35.0, MXN:19.5, BRL:5.65, ZAR:20.1, SEK:11.3, NOK:11.5,
+      DKK:7.46, NZD:1.79, AED:3.97, SAR:4.05, ILS:3.98, PLN:4.26,
+      CZK:25.0, HUF:392,
+    };
+  } finally {
+    btn.classList.remove('spinning');
+    recalcAll();
+  }
+}
+
+function setRateStatus(state, text) {
+  document.getElementById('rateDot').className = 'rate-dot ' + state;
+  document.getElementById('rateStatusText').textContent = text;
+}
+
+// ────────── CONVERSION ──────────
+function convert(amount, fromCurrency, toCurrency) {
+  if (fromCurrency === toCurrency) return amount;
+  const from = rates[fromCurrency] ?? 1;
+  const to   = rates[toCurrency]   ?? 1;
+  // via EUR base: amount / from * to
+  return amount / from * to;
+}
+
+function baseCurrency() { return document.getElementById('baseCurrency').value; }
+
+function fmt(val, currency) {
+  const sym = CURRENCIES[currency]?.symbol ?? '';
+  if (!val && val !== 0) return `${sym}—`;
+  if (Math.abs(val) >= 1000000) return sym + (val/1000000).toFixed(2) + 'M';
+  if (Math.abs(val) >= 10000)  return sym + Math.round(val).toLocaleString();
+  return sym + val.toLocaleString(undefined, { minimumFractionDigits:0, maximumFractionDigits:2 });
+}
+
+// ────────── RENDER ──────────
+function buildCurrencyOptions(selected) {
+  return Object.entries(CURRENCIES).map(([code, info]) =>
+    `<option value="${code}" ${code===selected?'selected':''}>${info.flag} ${code} – ${info.name}</option>`
+  ).join('');
+}
+
+function buildCategoryOptions() {
+  return CATEGORIES.map(c =>
+    `<option value="${c.value}">${c.label}</option>`
+  ).join('');
+}
+
+function renderAll() {
+  const container = document.getElementById('countriesContainer');
+  const noDiv = document.getElementById('noCountries');
+
+  if (countries.length === 0) {
+    container.innerHTML = '';
+    noDiv.style.display = 'block';
+    document.getElementById('summaryPanel').style.display = 'none';
+    return;
+  }
+  noDiv.style.display = 'none';
+
+  // Re-render changed cards only (simple approach: full re-render)
+  container.innerHTML = countries.map(c => renderCountryCard(c)).join('');
+  updateSummary();
+}
+
+function renderCountryCard(c) {
+  const rateToBase = Object.keys(rates).length > 0
+    ? `1 ${c.currency} = ${fmt(convert(1, c.currency, baseCurrency()), baseCurrency())} ${baseCurrency()}`
+    : '—';
+
+  const rows = c.expenses.map((e, i) => {
+    const converted = convert(e.amount || 0, c.currency, baseCurrency());
+    return `
+    <div class="expense-row" id="row-${c.id}-${i}">
+      <select class="col-cat" onchange="updateExpense(${c.id},${i},'category',this.value)">
+        ${CATEGORIES.map(cat => `<option value="${cat.value}" ${cat.value===e.category?'selected':''}>${cat.label}</option>`).join('')}
+      </select>
+      <input type="text" placeholder="説明（例：ルーブル美術館）" value="${escHtml(e.desc)}"
+        oninput="updateExpense(${c.id},${i},'desc',this.value)">
+      <input class="col-amount" type="number" min="0" step="any" placeholder="金額"
+        value="${e.amount||''}" oninput="updateExpense(${c.id},${i},'amount',parseFloat(this.value)||0)">
+      <div class="converted-amount col-converted">${e.amount ? fmt(converted, baseCurrency()) : '—'}</div>
+      <button class="btn-del-row col-delete" onclick="removeExpense(${c.id},${i})" title="削除">🗑</button>
+    </div>`;
+  }).join('');
+
+  const subtotal = c.expenses.reduce((s,e) => s + convert(e.amount||0, c.currency, baseCurrency()), 0);
+
+  return `
+  <div class="country-card" id="card-${c.id}">
+    <div class="country-header">
+      <span class="country-emoji" title="クリックで変更" onclick="changeEmoji(${c.id})">${c.emoji}</span>
+      <input class="country-name-input" value="${escHtml(c.name)}" placeholder="国名"
+        oninput="updateCountry(${c.id},'name',this.value)">
+      <select class="currency-select" onchange="updateCountry(${c.id},'currency',this.value)">
+        ${buildCurrencyOptions(c.currency)}
+      </select>
+      <span class="country-rate" id="rate-${c.id}">${rateToBase}</span>
+      <button class="btn-remove-country" onclick="removeCountry(${c.id})" title="この国を削除">✕</button>
+    </div>
+    <div class="expense-table">
+      <div class="expense-table-header">
+        <span class="col-header">カテゴリ</span>
+        <span class="col-header">説明</span>
+        <span class="col-header">金額（${c.currency}）</span>
+        <span class="col-header">換算（${baseCurrency()}）</span>
+        <span></span>
+      </div>
+      ${rows}
+    </div>
+    <div class="country-footer">
+      <button class="btn-add-row" onclick="addExpense(${c.id})">＋ 費用を追加</button>
+      <div class="country-subtotal" id="subtotal-${c.id}">
+        <span>小計</span>${fmt(subtotal, baseCurrency())}
+      </div>
+    </div>
+  </div>`;
+}
+
+function updateSummary() {
+  if (countries.length === 0) {
+    document.getElementById('summaryPanel').style.display = 'none';
+    return;
+  }
+  document.getElementById('summaryPanel').style.display = 'block';
+
+  const base = baseCurrency();
+  let grand = 0;
+  const rows = countries.map(c => {
+    const sub = c.expenses.reduce((s,e) => s + convert(e.amount||0, c.currency, base), 0);
+    grand += sub;
+    return `<div class="summary-row">
+      <span class="label">${c.emoji} ${c.name || '未設定の国'}</span>
+      <span class="amount">${fmt(sub, base)}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('summaryRows').innerHTML = rows;
+  document.getElementById('grandTotal').textContent = fmt(grand, base);
+  updateBudgetStatus();
+}
+
+function updateBudgetStatus() {
+  const base = baseCurrency();
+  const budgetVal = parseFloat(document.getElementById('budgetInput').value);
+  const grand = countries.reduce((s,c) =>
+    s + c.expenses.reduce((es,e) => es + convert(e.amount||0, c.currency, base), 0), 0);
+
+  const el = document.getElementById('budgetStatus');
+  if (!budgetVal || isNaN(budgetVal)) { el.style.display='none'; return; }
+  el.style.display = 'inline-block';
+  if (grand > budgetVal) {
+    el.className = 'budget-status over';
+    el.textContent = `⚠️ 予算オーバー ${fmt(grand - budgetVal, base)}`;
+  } else {
+    el.className = 'budget-status ok';
+    el.textContent = `✅ 残り ${fmt(budgetVal - grand, base)}`;
+  }
+}
+
+// ────────── COUNTRY CRUD ──────────
+function addCountry() {
+  const preset = COUNTRY_PRESETS[countries.length % COUNTRY_PRESETS.length];
+  const c = {
+    id: nextId++,
+    name: preset.name,
+    currency: preset.currency,
+    emoji: preset.emoji,
+    expenses: [{ category:'hotel', desc:'', amount:'' }],
+  };
+  countries.push(c);
+  renderAll();
+}
+
+function removeCountry(id) {
+  countries = countries.filter(c => c.id !== id);
+  renderAll();
+}
+
+function updateCountry(id, key, val) {
+  const c = countries.find(c => c.id === id);
+  if (!c) return;
+  c[key] = val;
+  if (key === 'currency') {
+    // update rate label
+    const base = baseCurrency();
+    const rateEl = document.getElementById('rate-' + id);
+    if (rateEl) {
+      rateEl.textContent = `1 ${val} = ${fmt(convert(1, val, base), base)} ${base}`;
+    }
+    // update header column
+    const headers = document.querySelectorAll(`#card-${id} .expense-table-header .col-header`);
+    if (headers[2]) headers[2].textContent = `金額（${val}）`;
+  }
+  recalcCard(id);
+}
+
+const EMOJIS = ['🇯🇵','🇺🇸','🇬🇧','🇫🇷','🇩🇪','🇮🇹','🇪🇸','🇦🇺','🇨🇦','🇰🇷','🇨🇳','🇹🇼',
+  '🇹🇭','🇸🇬','🇭🇰','🇮🇩','🇲🇾','🇵🇭','🇻🇳','🇮🇳','🇳🇿','🇧🇷','🇲🇽','🇿🇦',
+  '🇸🇪','🇳🇴','🇩🇰','🇵🇱','🇨🇿','🇭🇺','🇨🇭','🇦🇪','🇸🇦','🇮🇱','🇹🇷'];
+
+function changeEmoji(id) {
+  const c = countries.find(c => c.id === id);
+  if (!c) return;
+  const cur = EMOJIS.indexOf(c.emoji);
+  c.emoji = EMOJIS[(cur + 1) % EMOJIS.length];
+  const el = document.querySelector(`#card-${id} .country-emoji`);
+  if (el) el.textContent = c.emoji;
+  updateSummary();
+}
+
+// ────────── EXPENSE CRUD ──────────
+function addExpense(countryId) {
+  const c = countries.find(c => c.id === countryId);
+  if (!c) return;
+  c.expenses.push({ category:'food', desc:'', amount:'' });
+  renderAll();
+}
+
+function removeExpense(countryId, idx) {
+  const c = countries.find(c => c.id === countryId);
+  if (!c) return;
+  c.expenses.splice(idx, 1);
+  renderAll();
+}
+
+function updateExpense(countryId, idx, key, val) {
+  const c = countries.find(c => c.id === countryId);
+  if (!c || !c.expenses[idx]) return;
+  c.expenses[idx][key] = val;
+  if (key === 'amount') recalcCard(countryId);
+}
+
+// ────────── RECALC ──────────
+function recalcCard(id) {
+  const c = countries.find(c => c.id === id);
+  if (!c) return;
+  const base = baseCurrency();
+  const subtotal = c.expenses.reduce((s,e) => s + convert(e.amount||0, c.currency, base), 0);
+  const subEl = document.getElementById('subtotal-' + id);
+  if (subEl) subEl.innerHTML = `<span>小計</span>${fmt(subtotal, base)}`;
+
+  c.expenses.forEach((e, i) => {
+    const converted = convert(e.amount||0, c.currency, base);
+    const el = document.querySelector(`#card-${id} .expense-row:nth-child(${i+1}) .converted-amount`);
+    if (el) el.textContent = e.amount ? fmt(converted, base) : '—';
+  });
+  updateSummary();
+}
+
+function recalcAll() {
+  countries.forEach(c => {
+    const base = baseCurrency();
+    const rateEl = document.getElementById('rate-' + c.id);
+    if (rateEl) {
+      rateEl.textContent = `1 ${c.currency} = ${fmt(convert(1, c.currency, base), base)} ${base}`;
+    }
+  });
+  renderAll();
+}
+
+// ────────── UTILS ──────────
+function escHtml(s) {
+  return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ────────── INIT ──────────
+(async function init() {
+  // Add two starter countries
+  countries.push({ id:nextId++, name:'アメリカ', currency:'USD', emoji:'🇺🇸',
+    expenses:[
+      { category:'flight', desc:'往復航空券', amount:'' },
+      { category:'hotel', desc:'ホテル（1泊）', amount:'' },
+    ]
+  });
+  countries.push({ id:nextId++, name:'フランス', currency:'EUR', emoji:'🇫🇷',
+    expenses:[
+      { category:'hotel', desc:'ホテル（1泊）', amount:'' },
+      { category:'entrance', desc:'ルーブル美術館', amount:'' },
+    ]
+  });
+  renderAll();
+  await fetchRates();
+})();
+</script>
+</body>
+</html>
