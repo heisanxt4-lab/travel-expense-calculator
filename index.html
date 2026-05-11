@@ -532,10 +532,16 @@ async function fetchRates() {
     },
   ];
 
+  function fetchWithTimeout(url, ms) {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(tid));
+  }
+
   let lastErr;
   for (const api of APIS) {
     try {
-      const res = await fetch(api.url, { signal: AbortSignal.timeout(6000) });
+      const res = await fetchWithTimeout(api.url, 8000);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       const { rates: r, date } = api.parse(data);
@@ -821,21 +827,59 @@ function escHtml(s) {
   return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ────────── LOCALSTORAGE ──────────
+const STORAGE_KEY = 'travel_expense_v1';
+
+function saveState() {
+  try {
+    const state = {
+      countries,
+      nextId,
+      tripName: document.getElementById('tripName').value,
+      baseCurrency: document.getElementById('baseCurrency').value,
+      budget: document.getElementById('budgetInput').value,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    countries = state.countries ?? [];
+    nextId = state.nextId ?? (countries.length + 1);
+    if (state.tripName) document.getElementById('tripName').value = state.tripName;
+    if (state.baseCurrency) document.getElementById('baseCurrency').value = state.baseCurrency;
+    if (state.budget) document.getElementById('budgetInput').value = state.budget;
+    return countries.length > 0;
+  } catch(e) {
+    return false;
+  }
+}
+
+// 保存トリガー：入力のたびに自動保存
+document.addEventListener('input', () => saveState());
+document.addEventListener('change', () => saveState());
+
 // ────────── INIT ──────────
 (async function init() {
-  // Add two starter countries
-  countries.push({ id:nextId++, name:'アメリカ', currency:'USD', emoji:'🇺🇸',
-    expenses:[
-      { category:'flight', desc:'往復航空券', amount:'' },
-      { category:'hotel', desc:'ホテル（1泊）', amount:'' },
-    ]
-  });
-  countries.push({ id:nextId++, name:'フランス', currency:'EUR', emoji:'🇫🇷',
-    expenses:[
-      { category:'hotel', desc:'ホテル（1泊）', amount:'' },
-      { category:'entrance', desc:'ルーブル美術館', amount:'' },
-    ]
-  });
+  const restored = loadState();
+  if (!restored) {
+    countries.push({ id:nextId++, name:'アメリカ', currency:'USD', emoji:'🇺🇸',
+      expenses:[
+        { category:'flight', desc:'往復航空券', amount:'' },
+        { category:'hotel', desc:'ホテル（1泊）', amount:'' },
+      ]
+    });
+    countries.push({ id:nextId++, name:'フランス', currency:'EUR', emoji:'🇫🇷',
+      expenses:[
+        { category:'hotel', desc:'ホテル（1泊）', amount:'' },
+        { category:'entrance', desc:'ルーブル美術館', amount:'' },
+      ]
+    });
+  }
   renderAll();
   await fetchRates();
 })();
