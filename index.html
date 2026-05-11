@@ -516,30 +516,54 @@ async function fetchRates() {
   setRateStatus('loading', 'レート取得中…');
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
-  try {
-    const res = await fetch('https://api.frankfurter.app/latest');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    // data.base = 'EUR', data.rates = { USD:..., JPY:..., ... }
-    rates = { ...data.rates, EUR: 1 }; // add EUR itself
-    rateBase = 'EUR';
-    rateDate = data.date;
-    setRateStatus('ok', `更新済み（${rateDate}）`);
-  } catch(e) {
-    setRateStatus('error', 'レート取得失敗 – オフライン換算');
-    // fallback approximate rates (vs EUR)
-    rates = {
-      EUR:1, USD:1.08, JPY:164, GBP:0.86, AUD:1.67, CAD:1.47,
-      CHF:0.97, HKD:8.43, SGD:1.46, KRW:1450, CNY:7.82, TWD:34.8,
-      THB:38.5, IDR:17200, MYR:5.06, PHP:60.5, VND:27200, INR:90.5,
-      TRY:35.0, MXN:19.5, BRL:5.65, ZAR:20.1, SEK:11.3, NOK:11.5,
-      DKK:7.46, NZD:1.79, AED:3.97, SAR:4.05, ILS:3.98, PLN:4.26,
-      CZK:25.0, HUF:392,
-    };
-  } finally {
-    btn.classList.remove('spinning');
-    recalcAll();
+
+  const APIS = [
+    {
+      url: 'https://api.frankfurter.app/latest',
+      parse: (d) => ({ rates: { ...d.rates, EUR: 1 }, date: d.date }),
+    },
+    {
+      url: 'https://open.er-api.com/v6/latest/EUR',
+      parse: (d) => ({ rates: d.rates, date: d.time_last_update_utc?.slice(0,10) ?? '' }),
+    },
+    {
+      url: 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json',
+      parse: (d) => ({ rates: Object.fromEntries(Object.entries(d.eur).map(([k,v])=>[k.toUpperCase(),v])), date: d.date }),
+    },
+  ];
+
+  let lastErr;
+  for (const api of APIS) {
+    try {
+      const res = await fetch(api.url, { signal: AbortSignal.timeout(6000) });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const { rates: r, date } = api.parse(data);
+      if (!r.JPY) throw new Error('JPYデータなし');
+      rates = r;
+      if (!rates.EUR) rates.EUR = 1;
+      rateDate = date;
+      setRateStatus('ok', `更新済み（${rateDate}）`);
+      btn.classList.remove('spinning');
+      recalcAll();
+      return;
+    } catch(e) {
+      lastErr = e;
+    }
   }
+
+  // 全API失敗時のフォールバック
+  setRateStatus('error', 'レート取得失敗 – 概算換算');
+  rates = {
+    EUR:1, USD:1.08, JPY:164, GBP:0.86, AUD:1.67, CAD:1.47,
+    CHF:0.97, HKD:8.43, SGD:1.46, KRW:1450, CNY:7.82, TWD:34.8,
+    THB:38.5, IDR:17200, MYR:5.06, PHP:60.5, VND:27200, INR:90.5,
+    TRY:35.0, MXN:19.5, BRL:5.65, ZAR:20.1, SEK:11.3, NOK:11.5,
+    DKK:7.46, NZD:1.79, AED:3.97, SAR:4.05, ILS:3.98, PLN:4.26,
+    CZK:25.0, HUF:392,
+  };
+  btn.classList.remove('spinning');
+  recalcAll();
 }
 
 function setRateStatus(state, text) {
