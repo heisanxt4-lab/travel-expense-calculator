@@ -721,6 +721,92 @@ function updateBudgetStatus() {
   }
 }
 
+// ────────── COUNTRY NAME → FLAG ──────────
+const NAME_TO_EMOJI = {
+  // 日本語
+  'アメリカ':'🇺🇸','米国':'🇺🇸','usa':'🇺🇸','america':'🇺🇸','united states':'🇺🇸',
+  'イギリス':'🇬🇧','英国':'🇬🇧','uk':'🇬🇧','england':'🇬🇧','britain':'🇬🇧',
+  'フランス':'🇫🇷','france':'🇫🇷',
+  'ドイツ':'🇩🇪','germany':'🇩🇪',
+  'イタリア':'🇮🇹','italy':'🇮🇹',
+  'スペイン':'🇪🇸','spain':'🇪🇸',
+  'ポルトガル':'🇵🇹','portugal':'🇵🇹',
+  'オーストリア':'🇦🇹','austria':'🇦🇹',
+  'スイス':'🇨🇭','switzerland':'🇨🇭',
+  'オランダ':'🇳🇱','netherlands':'🇳🇱','holland':'🇳🇱',
+  'ベルギー':'🇧🇪','belgium':'🇧🇪',
+  'スウェーデン':'🇸🇪','sweden':'🇸🇪',
+  'ノルウェー':'🇳🇴','norway':'🇳🇴',
+  'デンマーク':'🇩🇰','denmark':'🇩🇰',
+  'フィンランド':'🇫🇮','finland':'🇫🇮',
+  'ポーランド':'🇵🇱','poland':'🇵🇱',
+  'チェコ':'🇨🇿','czech':'🇨🇿',
+  'ハンガリー':'🇭🇺','hungary':'🇭🇺',
+  'ギリシャ':'🇬🇷','greece':'🇬🇷',
+  'トルコ':'🇹🇷','turkey':'🇹🇷',
+  'ロシア':'🇷🇺','russia':'🇷🇺',
+  'オーストラリア':'🇦🇺','australia':'🇦🇺',
+  'ニュージーランド':'🇳🇿','new zealand':'🇳🇿',
+  'カナダ':'🇨🇦','canada':'🇨🇦',
+  'メキシコ':'🇲🇽','mexico':'🇲🇽',
+  'ブラジル':'🇧🇷','brazil':'🇧🇷',
+  'アルゼンチン':'🇦🇷','argentina':'🇦🇷',
+  'ペルー':'🇵🇪','peru':'🇵🇪',
+  'チリ':'🇨🇱','chile':'🇨🇱',
+  '韓国':'🇰🇷','korea':'🇰🇷','south korea':'🇰🇷',
+  '中国':'🇨🇳','china':'🇨🇳',
+  '台湾':'🇹🇼','taiwan':'🇹🇼',
+  '香港':'🇭🇰','hong kong':'🇭🇰',
+  'タイ':'🇹🇭','thailand':'🇹🇭',
+  'ベトナム':'🇻🇳','vietnam':'🇻🇳',
+  'カンボジア':'🇰🇭','cambodia':'🇰🇭',
+  'ラオス':'🇱🇦','laos':'🇱🇦',
+  'ミャンマー':'🇲🇲','myanmar':'🇲🇲',
+  'インドネシア':'🇮🇩','indonesia':'🇮🇩',
+  'マレーシア':'🇲🇾','malaysia':'🇲🇾',
+  'シンガポール':'🇸🇬','singapore':'🇸🇬',
+  'フィリピン':'🇵🇭','philippines':'🇵🇭',
+  'インド':'🇮🇳','india':'🇮🇳',
+  'スリランカ':'🇱🇰','sri lanka':'🇱🇰',
+  'ネパール':'🇳🇵','nepal':'🇳🇵',
+  'パキスタン':'🇵🇰','pakistan':'🇵🇰',
+  'バングラデシュ':'🇧🇩','bangladesh':'🇧🇩',
+  'UAE':'🇦🇪','ドバイ':'🇦🇪','dubai':'🇦🇪','uae':'🇦🇪',
+  'サウジアラビア':'🇸🇦','saudi':'🇸🇦',
+  'イスラエル':'🇮🇱','israel':'🇮🇱',
+  'エジプト':'🇪🇬','egypt':'🇪🇬',
+  'モロッコ':'🇲🇦','morocco':'🇲🇦',
+  '南アフリカ':'🇿🇦','south africa':'🇿🇦',
+  'ケニア':'🇰🇪','kenya':'🇰🇪',
+  'エチオピア':'🇪🇹','ethiopia':'🇪🇹',
+  '日本':'🇯🇵','japan':'🇯🇵',
+  'モナコ':'🇲🇨','monaco':'🇲🇨',
+  'クロアチア':'🇭🇷','croatia':'🇭🇷',
+  'アイスランド':'🇮🇸','iceland':'🇮🇸',
+  'アイルランド':'🇮🇪','ireland':'🇮🇪',
+  'ルーマニア':'🇷🇴','romania':'🇷🇴',
+  'ブルガリア':'🇧🇬','bulgaria':'🇧🇬',
+  'スロバキア':'🇸🇰','slovakia':'🇸🇰',
+  'スロベニア':'🇸🇮','slovenia':'🇸🇮',
+  'セルビア':'🇷🇸','serbia':'🇷🇸',
+  'ウクライナ':'🇺🇦','ukraine':'🇺🇦',
+  'コロンビア':'🇨🇴','colombia':'🇨🇴',
+  'キューバ':'🇨🇺','cuba':'🇨🇺',
+  'グアム':'🇬🇺','guam':'🇬🇺',
+  'ハワイ':'🇺🇸','hawaii':'🇺🇸',
+};
+
+function guessEmoji(name) {
+  const key = name.trim().toLowerCase();
+  if (!key) return null;
+  // 完全一致 or 部分一致
+  if (NAME_TO_EMOJI[key]) return NAME_TO_EMOJI[key];
+  for (const [k, v] of Object.entries(NAME_TO_EMOJI)) {
+    if (key.includes(k) || k.includes(key)) return v;
+  }
+  return null;
+}
+
 // ────────── COUNTRY CRUD ──────────
 function addCountry() {
   const preset = COUNTRY_PRESETS[countries.length % COUNTRY_PRESETS.length];
@@ -744,6 +830,14 @@ function updateCountry(id, key, val) {
   const c = countries.find(c => c.id === id);
   if (!c) return;
   c[key] = val;
+  if (key === 'name') {
+    const matched = guessEmoji(val);
+    if (matched) {
+      c.emoji = matched;
+      const el = document.querySelector(`#card-${id} .country-emoji`);
+      if (el) el.textContent = matched;
+    }
+  }
   if (key === 'currency') {
     // update rate label
     const base = baseCurrency();
