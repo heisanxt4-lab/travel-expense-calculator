@@ -23,9 +23,7 @@
     --shadow: 0 4px 24px rgba(37,99,235,0.08);
     --radius: 16px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
     background: var(--bg);
@@ -38,8 +36,8 @@
   .header {
     background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0ea5e9 100%);
     border-radius: var(--radius);
-    padding: 32px 28px 28px;
-    margin-bottom: 24px;
+    padding: 28px 28px 24px;
+    margin-bottom: 16px;
     color: white;
     box-shadow: 0 8px 32px rgba(37,99,235,0.3);
     position: relative;
@@ -47,362 +45,343 @@
   }
   .header::before {
     content: '✈️';
-    position: absolute;
-    right: 24px;
-    top: 20px;
-    font-size: 64px;
-    opacity: 0.15;
-    transform: rotate(-15deg);
+    position: absolute; right: 24px; top: 16px;
+    font-size: 64px; opacity: 0.15; transform: rotate(-15deg);
   }
-  .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-  .header p { font-size: 14px; opacity: 0.8; margin-top: 6px; }
+  .header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .header p  { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+
+  /* ── Trip bar ── */
+  .trip-bar {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .trip-bar-label { font-size: 12px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .trip-name-display {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    border: none;
+    background: transparent;
+    min-width: 120px;
+  }
+  .trip-name-display:focus { outline: none; border-bottom: 2px solid var(--primary); }
+  .btn-trips {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: var(--primary);
+    color: white;
+    border: none; border-radius: 10px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .btn-trips:hover { background: var(--primary-dark); }
+  .btn-new-trip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: none;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px; font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .btn-new-trip:hover { border-color: var(--success); color: var(--success); }
 
   /* ── Settings bar ── */
   .settings-bar {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-bottom: 20px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 16px;
     align-items: flex-end;
     box-shadow: var(--shadow);
   }
-  .settings-bar .field { display: flex; flex-direction: column; gap: 6px; }
-  .settings-bar label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .settings-bar select, .settings-bar input[type="text"] {
-    padding: 10px 14px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 14px;
-    background: var(--bg);
-    color: var(--text);
-    cursor: pointer;
-    transition: border-color 0.2s;
-    min-width: 160px;
+  .settings-bar .field { display: flex; flex-direction: column; gap: 5px; }
+  .settings-bar label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .settings-bar select {
+    padding: 9px 12px; border: 2px solid var(--border); border-radius: 10px;
+    font-size: 14px; background: var(--bg); color: var(--text); cursor: pointer;
+    transition: border-color 0.2s; min-width: 150px;
   }
-  .settings-bar select:focus, .settings-bar input:focus { outline: none; border-color: var(--primary); }
-
+  .settings-bar select:focus { outline: none; border-color: var(--primary); }
   .rate-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted);
     margin-left: auto;
-    padding: 8px 14px;
-    background: var(--bg);
-    border-radius: 10px;
+    padding: 8px 12px;
+    background: var(--bg); border-radius: 10px;
   }
-  .rate-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--muted);
-    flex-shrink: 0;
+  .rate-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; }
+  .rate-dot.loading { background:var(--warning); animation:pulse 1s infinite; }
+  .rate-dot.ok      { background:var(--success); }
+  .rate-dot.error   { background:var(--danger); }
+  .refresh-btn {
+    background:none; border:none; cursor:pointer; font-size:15px; padding:2px; line-height:1;
+    transition:transform 0.4s;
   }
-  .rate-dot.loading { background: var(--warning); animation: pulse 1s infinite; }
-  .rate-dot.ok { background: var(--success); }
-  .rate-dot.error { background: var(--danger); }
+  .refresh-btn:hover { transform:rotate(180deg); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
   /* ── Country Cards ── */
   .countries { display: flex; flex-direction: column; gap: 20px; }
-
   .country-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    border: 2px solid transparent;
-    transition: border-color 0.2s;
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden;
+    border: 2px solid transparent; transition: border-color 0.2s;
+    animation: slideIn 0.25s ease;
   }
   .country-card:focus-within { border-color: var(--accent); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
 
   .country-header {
-    background: linear-gradient(90deg, #f8fafc 0%, #e0f2fe 100%);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    background: linear-gradient(90deg, #f8fafc, #e0f2fe);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     border-bottom: 1px solid var(--border);
   }
-  .country-emoji { font-size: 28px; cursor: pointer; }
+  .country-emoji { font-size: 26px; cursor: pointer; flex-shrink: 0; }
   .country-name-input {
-    font-size: 18px;
-    font-weight: 700;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    flex: 1;
-    min-width: 120px;
+    font-size: 17px; font-weight: 700;
+    border: none; background: transparent; color: var(--text);
+    flex: 1; min-width: 100px;
   }
   .country-name-input:focus { outline: none; }
-
   .currency-select {
-    padding: 8px 12px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    background: white;
-    color: var(--primary);
-    cursor: pointer;
-    min-width: 120px;
+    padding: 7px 10px; border: 2px solid var(--border); border-radius: 10px;
+    font-size: 13px; font-weight: 600; background: white; color: var(--primary);
+    cursor: pointer; min-width: 110px;
   }
   .currency-select:focus { outline: none; border-color: var(--primary); }
 
-  .country-rate {
+  /* Rate lock row */
+  .rate-lock-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 8px 18px 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
     font-size: 12px;
-    color: var(--muted);
-    background: white;
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+  }
+  .rate-lock-label { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .rate-date-input {
+    padding: 5px 10px; border: 2px solid var(--border); border-radius: 8px;
+    font-size: 12px; background: white; color: var(--text); cursor: pointer;
+  }
+  .rate-date-input:focus { outline: none; border-color: var(--primary); }
+  .rate-badge {
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
     white-space: nowrap;
   }
+  .rate-badge.live    { background: #dcfce7; color: #16a34a; }
+  .rate-badge.locked  { background: #dbeafe; color: #1d4ed8; }
+  .rate-badge.loading { background: #fef9c3; color: #b45309; }
+  .rate-badge.error   { background: #fee2e2; color: #dc2626; }
+  .rate-value { color: var(--muted); font-size: 12px; }
 
   .btn-remove-country {
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 20px;
-    padding: 4px 8px;
-    border-radius: 8px;
+    margin-left: auto; background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 18px; padding: 4px 6px; border-radius: 8px;
     transition: background 0.15s, color 0.15s;
   }
   .btn-remove-country:hover { background: #fee2e2; color: var(--danger); }
 
   /* ── Expense table ── */
-  .expense-table { width: 100%; padding: 16px 20px; }
+  .expense-table { width: 100%; padding: 14px 18px; }
+  .expense-table-header {
+    display: grid; grid-template-columns: 1fr 2fr 150px 110px 36px;
+    gap: 8px; margin-bottom: 8px; padding: 0 2px;
+  }
+  .col-header { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  @media(max-width:680px){ .expense-table-header{ display:none; } }
 
   .expense-row {
-    display: grid;
-    grid-template-columns: 1fr 2fr 160px 120px 40px;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 8px;
+    display: grid; grid-template-columns: 1fr 2fr 150px 110px 36px;
+    gap: 8px; align-items: center; margin-bottom: 8px;
   }
-  @media (max-width: 680px) {
-    .expense-row {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-    }
-    .expense-row .col-amount { grid-column: 1; }
-    .expense-row .col-converted { grid-column: 2; }
-    .expense-row .col-delete { grid-column: 2; justify-self: end; }
+  @media(max-width:680px){
+    .expense-row { grid-template-columns: 1fr 1fr; }
+    .expense-row .col-amount   { grid-column:1; }
+    .expense-row .col-converted{ grid-column:2; }
+    .expense-row .col-delete   { grid-column:2; justify-self:end; }
   }
-
   .expense-row input, .expense-row select {
-    padding: 9px 12px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 14px;
-    background: var(--bg);
-    color: var(--text);
-    width: 100%;
+    padding: 8px 11px; border: 2px solid var(--border); border-radius: 10px;
+    font-size: 13px; background: var(--bg); color: var(--text); width: 100%;
     transition: border-color 0.15s;
   }
   .expense-row input:focus, .expense-row select:focus { outline: none; border-color: var(--primary); }
-
-  .converted-amount {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--primary);
-    text-align: right;
-    padding-right: 4px;
-  }
-
+  .converted-amount { font-size: 13px; font-weight: 600; color: var(--primary); text-align: right; padding-right: 2px; }
   .btn-del-row {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 18px;
-    padding: 6px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 17px; padding: 5px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
     transition: background 0.15s, color 0.15s;
   }
   .btn-del-row:hover { background: #fee2e2; color: var(--danger); }
 
-  .expense-table-header {
-    display: grid;
-    grid-template-columns: 1fr 2fr 160px 120px 40px;
-    gap: 8px;
-    margin-bottom: 8px;
-    padding: 0 2px;
-  }
-  .col-header {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-  }
-  @media (max-width: 680px) {
-    .expense-table-header { display: none; }
-  }
-
   .country-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px 16px;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 18px 14px; flex-wrap: wrap; gap: 8px;
   }
   .btn-add-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 16px;
-    background: none;
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    color: var(--muted);
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px; padding: 8px 14px;
+    background: none; border: 2px dashed var(--border); border-radius: 10px;
+    color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s;
   }
   .btn-add-row:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
-
   .country-subtotal {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--primary);
-    background: #eff6ff;
-    padding: 8px 16px;
-    border-radius: 10px;
+    font-size: 14px; font-weight: 700; color: var(--primary);
+    background: #eff6ff; padding: 7px 14px; border-radius: 10px;
   }
-  .country-subtotal span { color: var(--muted); font-weight: 400; font-size: 13px; margin-right: 4px; }
+  .country-subtotal span { color: var(--muted); font-weight: 400; font-size: 12px; margin-right: 4px; }
 
-  /* ── Add country button ── */
+  /* ── Add country ── */
   .btn-add-country {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 18px;
-    background: none;
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    color: var(--muted);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 16px;
+    background: none; border: 2px dashed var(--border); border-radius: var(--radius);
+    color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; margin-top: 4px;
   }
   .btn-add-country:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
 
-  /* ── Summary panel ── */
+  /* ── Summary ── */
   .summary-panel {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%);
-    border-radius: var(--radius);
-    padding: 28px 28px 24px;
-    margin-top: 28px;
-    color: white;
-    box-shadow: 0 8px 32px rgba(37,99,235,0.3);
+    background: linear-gradient(135deg, #1e3a8a, #2563eb 60%, #0ea5e9);
+    border-radius: var(--radius); padding: 24px 24px 20px; margin-top: 24px;
+    color: white; box-shadow: 0 8px 32px rgba(37,99,235,0.3);
   }
-  .summary-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; opacity: 0.9; }
-  .summary-rows { display: flex; flex-direction: column; gap: 10px; }
+  .summary-panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; opacity: 0.9; }
+  .summary-rows { display: flex; flex-direction: column; gap: 8px; }
   .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 12px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 16px;
   }
-  .summary-row .label { font-size: 14px; opacity: 0.85; }
-  .summary-row .amount { font-size: 16px; font-weight: 700; }
+  .summary-row .label { font-size: 13px; opacity: 0.85; }
+  .summary-row .amount { font-size: 15px; font-weight: 700; }
   .summary-total {
-    border-top: 1px solid rgba(255,255,255,0.3);
-    margin-top: 12px;
-    padding-top: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    border-top: 1px solid rgba(255,255,255,0.3); margin-top: 10px; padding-top: 14px;
+    display: flex; justify-content: space-between; align-items: baseline;
   }
-  .summary-total .label { font-size: 16px; font-weight: 600; }
-  .summary-total .amount { font-size: 28px; font-weight: 800; }
-
-  .budget-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); }
-  .budget-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .budget-label { font-size: 14px; opacity: 0.85; white-space: nowrap; }
+  .summary-total .label  { font-size: 15px; font-weight: 600; }
+  .summary-total .amount { font-size: 26px; font-weight: 800; }
+  .budget-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.2); }
+  .budget-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .budget-label { font-size: 13px; opacity: 0.85; white-space: nowrap; }
   .budget-input {
-    padding: 10px 14px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    background: rgba(255,255,255,0.1);
-    color: white;
-    width: 160px;
+    padding: 9px 12px; border: 2px solid rgba(255,255,255,0.4); border-radius: 10px;
+    font-size: 14px; font-weight: 600; background: rgba(255,255,255,0.1); color: white; width: 150px;
   }
   .budget-input::placeholder { color: rgba(255,255,255,0.5); }
   .budget-input:focus { outline: none; border-color: white; }
   .budget-status {
-    font-size: 14px;
-    font-weight: 700;
-    padding: 8px 14px;
-    border-radius: 10px;
+    font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 10px;
     background: rgba(255,255,255,0.15);
   }
   .budget-status.over { background: rgba(239,68,68,0.35); }
-  .budget-status.ok { background: rgba(16,185,129,0.35); }
+  .budget-status.ok   { background: rgba(16,185,129,0.35); }
 
-  /* ── Category badge ── */
-  .CATEGORY_COLORS { display: none; }
-
-  /* ── Animations ── */
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  @keyframes slideIn {
-    from { opacity:0; transform:translateY(-12px); }
-    to   { opacity:1; transform:translateY(0); }
+  /* ── Trips Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 60px 16px 20px; z-index: 1000;
+    animation: fadeIn 0.2s ease;
   }
-  .country-card { animation: slideIn 0.25s ease; }
+  .modal-overlay.hidden { display: none; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
-  /* ── Misc ── */
-  .no-countries {
-    text-align: center;
-    color: var(--muted);
-    padding: 40px 20px;
-    font-size: 15px;
+  .modal {
+    background: white; border-radius: var(--radius); width: 100%; max-width: 540px;
+    max-height: 80vh; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+    animation: slideUp 0.25s ease;
   }
+  @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
 
-  .refresh-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 2px;
-    line-height: 1;
-    transition: transform 0.4s;
+  .modal-header {
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
   }
-  .refresh-btn:hover { transform: rotate(180deg); }
-  .refresh-btn.spinning { animation: spin 1s linear; }
-  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .modal-header h3 { font-size: 17px; font-weight: 700; }
+  .modal-close {
+    background: none; border: none; font-size: 22px; color: var(--muted);
+    cursor: pointer; padding: 2px 6px; border-radius: 8px; line-height: 1;
+  }
+  .modal-close:hover { background: var(--bg); }
+
+  .modal-body { overflow-y: auto; flex: 1; padding: 16px 24px 24px; }
+
+  .btn-create-trip {
+    width: 100%; padding: 12px; border: 2px dashed var(--border); border-radius: 12px;
+    background: none; color: var(--muted); font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-bottom: 16px; transition: all 0.15s;
+  }
+  .btn-create-trip:hover { border-color: var(--success); color: var(--success); background: #f0fdf4; }
+
+  .trip-list { display: flex; flex-direction: column; gap: 10px; }
+  .trip-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-radius: 12px;
+    border: 2px solid var(--border); cursor: pointer;
+    transition: all 0.15s; background: white;
+  }
+  .trip-item:hover { border-color: var(--accent); background: #f0f9ff; }
+  .trip-item.active { border-color: var(--primary); background: #eff6ff; }
+  .trip-item-icon { font-size: 24px; flex-shrink: 0; }
+  .trip-item-info { flex: 1; min-width: 0; }
+  .trip-item-name { font-size: 15px; font-weight: 700; color: var(--text); }
+  .trip-item-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .trip-item-total { font-size: 15px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+  .btn-del-trip {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 17px; padding: 5px; border-radius: 8px; flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .btn-del-trip:hover { background: #fee2e2; color: var(--danger); }
+  .trip-empty { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
+
+  /* ── no countries ── */
+  .no-countries { text-align:center; color:var(--muted); padding:36px 20px; font-size:14px; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>✈️ 海外旅費計算ツール</h1>
-  <p>複数の国を旅するときの費用を一括管理＆最新レートで自動換算</p>
+  <p>複数の旅行を保存・管理＆各国ごとにレートを日付固定して正確計算</p>
 </div>
 
+<!-- Trip bar -->
+<div class="trip-bar">
+  <span class="trip-bar-label">📁 旅行：</span>
+  <input class="trip-name-display" id="tripNameInput" value="" placeholder="旅行名を入力" oninput="onTripNameChange(this.value)">
+  <button class="btn-new-trip" onclick="createNewTrip()">＋ 新規作成</button>
+  <button class="btn-trips" onclick="openModal()">📋 一覧・切り替え</button>
+</div>
+
+<!-- Settings -->
 <div class="settings-bar">
   <div class="field">
     <label>基準通貨（合計表示）</label>
-    <select id="baseCurrency" onchange="recalcAll()">
-      <option value="JPY" selected>🇯🇵 JPY – 日本円</option>
+    <select id="baseCurrency" onchange="onBaseCurrencyChange(this.value)">
+      <option value="JPY">🇯🇵 JPY – 日本円</option>
       <option value="USD">🇺🇸 USD – 米ドル</option>
       <option value="EUR">🇪🇺 EUR – ユーロ</option>
       <option value="GBP">🇬🇧 GBP – 英ポンド</option>
@@ -410,26 +389,19 @@
       <option value="CAD">🇨🇦 CAD – カナダドル</option>
     </select>
   </div>
-  <div class="field">
-    <label>旅行名・メモ</label>
-    <input type="text" id="tripName" placeholder="例：ヨーロッパ一周 2025夏" style="min-width:220px">
-  </div>
   <div class="rate-status" id="rateStatus">
     <div class="rate-dot loading" id="rateDot"></div>
-    <span id="rateStatusText">レート取得中…</span>
-    <button class="refresh-btn" id="refreshBtn" onclick="fetchRates()" title="レートを更新">🔄</button>
+    <span id="rateStatusText">本日レート取得中…</span>
+    <button class="refresh-btn" id="refreshBtn" onclick="fetchLiveRates()" title="本日レートを更新">🔄</button>
   </div>
 </div>
 
+<!-- Countries -->
 <div class="countries" id="countriesContainer"></div>
-<div id="noCountries" class="no-countries" style="display:none">
-  国を追加してください 👇
-</div>
+<div id="noCountries" class="no-countries" style="display:none">国を追加してください 👇</div>
+<button class="btn-add-country" onclick="addCountry()">＋ 国を追加する</button>
 
-<button class="btn-add-country" onclick="addCountry()">
-  ＋ 国を追加する
-</button>
-
+<!-- Summary -->
 <div class="summary-panel" id="summaryPanel" style="display:none">
   <h2>📊 旅費サマリー</h2>
   <div class="summary-rows" id="summaryRows"></div>
@@ -440,294 +412,92 @@
   <div class="budget-section">
     <div class="budget-row">
       <span class="budget-label">予算上限：</span>
-      <input class="budget-input" type="number" id="budgetInput" placeholder="例: 300000" oninput="updateBudgetStatus()">
+      <input class="budget-input" type="number" id="budgetInput" placeholder="例: 300000" oninput="onBudgetChange(this.value)">
       <span class="budget-status" id="budgetStatus" style="display:none"></span>
     </div>
   </div>
 </div>
 
+<!-- Trips modal -->
+<div class="modal-overlay hidden" id="tripsModal" onclick="onModalOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📋 保存した旅行</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <button class="btn-create-trip" onclick="createNewTrip(); closeModal()">＋ 新しい旅行を作成</button>
+      <div class="trip-list" id="tripList"></div>
+    </div>
+  </div>
+</div>
+
 <script>
-// ────────── DATA ──────────
+// ══════════════════════════════════════════
+//  STATIC DATA
+// ══════════════════════════════════════════
 const CURRENCIES = {
-  JPY:{ name:'日本円',       symbol:'¥',  flag:'🇯🇵' },
-  USD:{ name:'米ドル',       symbol:'$',  flag:'🇺🇸' },
-  EUR:{ name:'ユーロ',       symbol:'€',  flag:'🇪🇺' },
-  GBP:{ name:'英ポンド',     symbol:'£',  flag:'🇬🇧' },
-  AUD:{ name:'豪ドル',       symbol:'A$', flag:'🇦🇺' },
-  CAD:{ name:'カナダドル',   symbol:'C$', flag:'🇨🇦' },
-  CHF:{ name:'スイスフラン', symbol:'Fr', flag:'🇨🇭' },
-  HKD:{ name:'香港ドル',     symbol:'HK$',flag:'🇭🇰' },
-  SGD:{ name:'シンガポール$',symbol:'S$', flag:'🇸🇬' },
-  KRW:{ name:'韓国ウォン',   symbol:'₩',  flag:'🇰🇷' },
-  CNY:{ name:'人民元',       symbol:'¥',  flag:'🇨🇳' },
-  TWD:{ name:'台湾ドル',     symbol:'NT$',flag:'🇹🇼' },
-  THB:{ name:'タイバーツ',   symbol:'฿',  flag:'🇹🇭' },
-  IDR:{ name:'インドネシアルピア',symbol:'Rp',flag:'🇮🇩' },
-  MYR:{ name:'マレーシアリンギット',symbol:'RM',flag:'🇲🇾' },
-  PHP:{ name:'フィリピンペソ',symbol:'₱', flag:'🇵🇭' },
-  VND:{ name:'ベトナムドン', symbol:'₫',  flag:'🇻🇳' },
-  INR:{ name:'インドルピー', symbol:'₹',  flag:'🇮🇳' },
-  TRY:{ name:'トルコリラ',   symbol:'₺',  flag:'🇹🇷' },
-  MXN:{ name:'メキシコペソ', symbol:'$',  flag:'🇲🇽' },
-  BRL:{ name:'ブラジルレアル',symbol:'R$',flag:'🇧🇷' },
-  ZAR:{ name:'南アフリカランド',symbol:'R',flag:'🇿🇦' },
-  SEK:{ name:'スウェーデンクローナ',symbol:'kr',flag:'🇸🇪' },
-  NOK:{ name:'ノルウェークローネ',symbol:'kr',flag:'🇳🇴' },
-  DKK:{ name:'デンマーククローネ',symbol:'kr',flag:'🇩🇰' },
-  NZD:{ name:'ニュージーランドドル',symbol:'NZ$',flag:'🇳🇿' },
-  AED:{ name:'UAEディルハム',symbol:'د.إ',flag:'🇦🇪' },
-  SAR:{ name:'サウジリヤル', symbol:'﷼', flag:'🇸🇦' },
-  ILS:{ name:'イスラエルシェケル',symbol:'₪',flag:'🇮🇱' },
-  PLN:{ name:'ポーランドズロチ',symbol:'zł',flag:'🇵🇱' },
-  CZK:{ name:'チェココルナ', symbol:'Kč',flag:'🇨🇿' },
-  HUF:{ name:'ハンガリーフォリント',symbol:'Ft',flag:'🇭🇺' },
+  JPY:{name:'日本円',symbol:'¥',flag:'🇯🇵'},
+  USD:{name:'米ドル',symbol:'$',flag:'🇺🇸'},
+  EUR:{name:'ユーロ',symbol:'€',flag:'🇪🇺'},
+  GBP:{name:'英ポンド',symbol:'£',flag:'🇬🇧'},
+  AUD:{name:'豪ドル',symbol:'A$',flag:'🇦🇺'},
+  CAD:{name:'カナダドル',symbol:'C$',flag:'🇨🇦'},
+  CHF:{name:'スイスフラン',symbol:'Fr',flag:'🇨🇭'},
+  HKD:{name:'香港ドル',symbol:'HK$',flag:'🇭🇰'},
+  SGD:{name:'シンガポール$',symbol:'S$',flag:'🇸🇬'},
+  KRW:{name:'韓国ウォン',symbol:'₩',flag:'🇰🇷'},
+  CNY:{name:'人民元',symbol:'¥',flag:'🇨🇳'},
+  TWD:{name:'台湾ドル',symbol:'NT$',flag:'🇹🇼'},
+  THB:{name:'タイバーツ',symbol:'฿',flag:'🇹🇭'},
+  IDR:{name:'インドネシアルピア',symbol:'Rp',flag:'🇮🇩'},
+  MYR:{name:'マレーシアリンギット',symbol:'RM',flag:'🇲🇾'},
+  PHP:{name:'フィリピンペソ',symbol:'₱',flag:'🇵🇭'},
+  VND:{name:'ベトナムドン',symbol:'₫',flag:'🇻🇳'},
+  INR:{name:'インドルピー',symbol:'₹',flag:'🇮🇳'},
+  TRY:{name:'トルコリラ',symbol:'₺',flag:'🇹🇷'},
+  MXN:{name:'メキシコペソ',symbol:'$',flag:'🇲🇽'},
+  BRL:{name:'ブラジルレアル',symbol:'R$',flag:'🇧🇷'},
+  ZAR:{name:'南アフリカランド',symbol:'R',flag:'🇿🇦'},
+  SEK:{name:'スウェーデンクローナ',symbol:'kr',flag:'🇸🇪'},
+  NOK:{name:'ノルウェークローネ',symbol:'kr',flag:'🇳🇴'},
+  DKK:{name:'デンマーククローネ',symbol:'kr',flag:'🇩🇰'},
+  NZD:{name:'ニュージーランドドル',symbol:'NZ$',flag:'🇳🇿'},
+  AED:{name:'UAEディルハム',symbol:'د.إ',flag:'🇦🇪'},
+  SAR:{name:'サウジリヤル',symbol:'﷼',flag:'🇸🇦'},
+  ILS:{name:'イスラエルシェケル',symbol:'₪',flag:'🇮🇱'},
+  PLN:{name:'ポーランドズロチ',symbol:'zł',flag:'🇵🇱'},
+  CZK:{name:'チェココルナ',symbol:'Kč',flag:'🇨🇿'},
+  HUF:{name:'ハンガリーフォリント',symbol:'Ft',flag:'🇭🇺'},
 };
 
 const CATEGORIES = [
-  { value:'flight',   label:'✈️ 航空券' },
-  { value:'hotel',    label:'🏨 ホテル' },
-  { value:'food',     label:'🍜 食事' },
-  { value:'transport',label:'🚇 交通' },
-  { value:'shopping', label:'🛍️ ショッピング' },
-  { value:'activity', label:'🎡 アクティビティ' },
-  { value:'entrance', label:'🎫 入場料' },
-  { value:'tip',      label:'💵 チップ' },
-  { value:'other',    label:'📝 その他' },
+  {value:'flight',   label:'✈️ 航空券'},
+  {value:'hotel',    label:'🏨 ホテル'},
+  {value:'food',     label:'🍜 食事'},
+  {value:'transport',label:'🚇 交通'},
+  {value:'shopping', label:'🛍️ ショッピング'},
+  {value:'activity', label:'🎡 アクティビティ'},
+  {value:'entrance', label:'🎫 入場料'},
+  {value:'tip',      label:'💵 チップ'},
+  {value:'other',    label:'📝 その他'},
 ];
 
 const COUNTRY_PRESETS = [
-  { name:'アメリカ',     currency:'USD', emoji:'🇺🇸' },
-  { name:'フランス',     currency:'EUR', emoji:'🇫🇷' },
-  { name:'イギリス',     currency:'GBP', emoji:'🇬🇧' },
-  { name:'オーストラリア',currency:'AUD', emoji:'🇦🇺' },
-  { name:'韓国',         currency:'KRW', emoji:'🇰🇷' },
-  { name:'台湾',         currency:'TWD', emoji:'🇹🇼' },
-  { name:'タイ',         currency:'THB', emoji:'🇹🇭' },
-  { name:'シンガポール', currency:'SGD', emoji:'🇸🇬' },
-  { name:'香港',         currency:'HKD', emoji:'🇭🇰' },
-  { name:'イタリア',     currency:'EUR', emoji:'🇮🇹' },
+  {name:'アメリカ',  currency:'USD', emoji:'🇺🇸'},
+  {name:'フランス',  currency:'EUR', emoji:'🇫🇷'},
+  {name:'イギリス',  currency:'GBP', emoji:'🇬🇧'},
+  {name:'オーストラリア', currency:'AUD', emoji:'🇦🇺'},
+  {name:'韓国',      currency:'KRW', emoji:'🇰🇷'},
+  {name:'台湾',      currency:'TWD', emoji:'🇹🇼'},
+  {name:'タイ',      currency:'THB', emoji:'🇹🇭'},
+  {name:'シンガポール', currency:'SGD', emoji:'🇸🇬'},
+  {name:'香港',      currency:'HKD', emoji:'🇭🇰'},
+  {name:'イタリア',  currency:'EUR', emoji:'🇮🇹'},
 ];
 
-let rates = {};       // { "USD": rate_in_EUR, ... } (base = EUR from API)
-let rateBase = 'EUR'; // frankfurter always returns EUR as base
-let rateDate = '';
-let countries = [];   // { id, name, currency, emoji, expenses:[] }
-let nextId = 1;
-
-// ────────── FETCH RATES ──────────
-async function fetchRates() {
-  setRateStatus('loading', 'レート取得中…');
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
-
-  const APIS = [
-    {
-      url: 'https://api.frankfurter.app/latest',
-      parse: (d) => ({ rates: { ...d.rates, EUR: 1 }, date: d.date }),
-    },
-    {
-      url: 'https://open.er-api.com/v6/latest/EUR',
-      parse: (d) => ({ rates: d.rates, date: d.time_last_update_utc?.slice(0,10) ?? '' }),
-    },
-    {
-      url: 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json',
-      parse: (d) => ({ rates: Object.fromEntries(Object.entries(d.eur).map(([k,v])=>[k.toUpperCase(),v])), date: d.date }),
-    },
-  ];
-
-  function fetchWithTimeout(url, ms) {
-    const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), ms);
-    return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(tid));
-  }
-
-  let lastErr;
-  for (const api of APIS) {
-    try {
-      const res = await fetchWithTimeout(api.url, 8000);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      const { rates: r, date } = api.parse(data);
-      if (!r.JPY) throw new Error('JPYデータなし');
-      rates = r;
-      if (!rates.EUR) rates.EUR = 1;
-      rateDate = date;
-      setRateStatus('ok', `更新済み（${rateDate}）`);
-      btn.classList.remove('spinning');
-      recalcAll();
-      return;
-    } catch(e) {
-      lastErr = e;
-    }
-  }
-
-  // 全API失敗時のフォールバック
-  setRateStatus('error', 'レート取得失敗 – 概算換算');
-  rates = {
-    EUR:1, USD:1.08, JPY:164, GBP:0.86, AUD:1.67, CAD:1.47,
-    CHF:0.97, HKD:8.43, SGD:1.46, KRW:1450, CNY:7.82, TWD:34.8,
-    THB:38.5, IDR:17200, MYR:5.06, PHP:60.5, VND:27200, INR:90.5,
-    TRY:35.0, MXN:19.5, BRL:5.65, ZAR:20.1, SEK:11.3, NOK:11.5,
-    DKK:7.46, NZD:1.79, AED:3.97, SAR:4.05, ILS:3.98, PLN:4.26,
-    CZK:25.0, HUF:392,
-  };
-  btn.classList.remove('spinning');
-  recalcAll();
-}
-
-function setRateStatus(state, text) {
-  document.getElementById('rateDot').className = 'rate-dot ' + state;
-  document.getElementById('rateStatusText').textContent = text;
-}
-
-// ────────── CONVERSION ──────────
-function convert(amount, fromCurrency, toCurrency) {
-  if (fromCurrency === toCurrency) return amount;
-  const from = rates[fromCurrency] ?? 1;
-  const to   = rates[toCurrency]   ?? 1;
-  // via EUR base: amount / from * to
-  return amount / from * to;
-}
-
-function baseCurrency() { return document.getElementById('baseCurrency').value; }
-
-function fmt(val, currency) {
-  const sym = CURRENCIES[currency]?.symbol ?? '';
-  if (!val && val !== 0) return `${sym}—`;
-  if (Math.abs(val) >= 1000000) return sym + (val/1000000).toFixed(2) + 'M';
-  if (Math.abs(val) >= 10000)  return sym + Math.round(val).toLocaleString();
-  return sym + val.toLocaleString(undefined, { minimumFractionDigits:0, maximumFractionDigits:2 });
-}
-
-// ────────── RENDER ──────────
-function buildCurrencyOptions(selected) {
-  return Object.entries(CURRENCIES).map(([code, info]) =>
-    `<option value="${code}" ${code===selected?'selected':''}>${info.flag} ${code} – ${info.name}</option>`
-  ).join('');
-}
-
-function buildCategoryOptions() {
-  return CATEGORIES.map(c =>
-    `<option value="${c.value}">${c.label}</option>`
-  ).join('');
-}
-
-function renderAll() {
-  const container = document.getElementById('countriesContainer');
-  const noDiv = document.getElementById('noCountries');
-
-  if (countries.length === 0) {
-    container.innerHTML = '';
-    noDiv.style.display = 'block';
-    document.getElementById('summaryPanel').style.display = 'none';
-    return;
-  }
-  noDiv.style.display = 'none';
-
-  // Re-render changed cards only (simple approach: full re-render)
-  container.innerHTML = countries.map(c => renderCountryCard(c)).join('');
-  updateSummary();
-}
-
-function renderCountryCard(c) {
-  const rateToBase = Object.keys(rates).length > 0
-    ? `1 ${c.currency} = ${fmt(convert(1, c.currency, baseCurrency()), baseCurrency())} ${baseCurrency()}`
-    : '—';
-
-  const rows = c.expenses.map((e, i) => {
-    const converted = convert(e.amount || 0, c.currency, baseCurrency());
-    return `
-    <div class="expense-row" id="row-${c.id}-${i}">
-      <select class="col-cat" onchange="updateExpense(${c.id},${i},'category',this.value)">
-        ${CATEGORIES.map(cat => `<option value="${cat.value}" ${cat.value===e.category?'selected':''}>${cat.label}</option>`).join('')}
-      </select>
-      <input type="text" placeholder="説明（例：ルーブル美術館）" value="${escHtml(e.desc)}"
-        oninput="updateExpense(${c.id},${i},'desc',this.value)">
-      <input class="col-amount" type="number" min="0" step="any" placeholder="金額"
-        value="${e.amount||''}" oninput="updateExpense(${c.id},${i},'amount',parseFloat(this.value)||0)">
-      <div class="converted-amount col-converted">${e.amount ? fmt(converted, baseCurrency()) : '—'}</div>
-      <button class="btn-del-row col-delete" onclick="removeExpense(${c.id},${i})" title="削除">🗑</button>
-    </div>`;
-  }).join('');
-
-  const subtotal = c.expenses.reduce((s,e) => s + convert(e.amount||0, c.currency, baseCurrency()), 0);
-
-  return `
-  <div class="country-card" id="card-${c.id}">
-    <div class="country-header">
-      <span class="country-emoji" title="クリックで変更" onclick="changeEmoji(${c.id})">${c.emoji}</span>
-      <input class="country-name-input" value="${escHtml(c.name)}" placeholder="国名"
-        oninput="updateCountry(${c.id},'name',this.value)">
-      <select class="currency-select" onchange="updateCountry(${c.id},'currency',this.value)">
-        ${buildCurrencyOptions(c.currency)}
-      </select>
-      <span class="country-rate" id="rate-${c.id}">${rateToBase}</span>
-      <button class="btn-remove-country" onclick="removeCountry(${c.id})" title="この国を削除">✕</button>
-    </div>
-    <div class="expense-table">
-      <div class="expense-table-header">
-        <span class="col-header">カテゴリ</span>
-        <span class="col-header">説明</span>
-        <span class="col-header">金額（${c.currency}）</span>
-        <span class="col-header">換算（${baseCurrency()}）</span>
-        <span></span>
-      </div>
-      ${rows}
-    </div>
-    <div class="country-footer">
-      <button class="btn-add-row" onclick="addExpense(${c.id})">＋ 費用を追加</button>
-      <div class="country-subtotal" id="subtotal-${c.id}">
-        <span>小計</span>${fmt(subtotal, baseCurrency())}
-      </div>
-    </div>
-  </div>`;
-}
-
-function updateSummary() {
-  if (countries.length === 0) {
-    document.getElementById('summaryPanel').style.display = 'none';
-    return;
-  }
-  document.getElementById('summaryPanel').style.display = 'block';
-
-  const base = baseCurrency();
-  let grand = 0;
-  const rows = countries.map(c => {
-    const sub = c.expenses.reduce((s,e) => s + convert(e.amount||0, c.currency, base), 0);
-    grand += sub;
-    return `<div class="summary-row">
-      <span class="label">${c.emoji} ${c.name || '未設定の国'}</span>
-      <span class="amount">${fmt(sub, base)}</span>
-    </div>`;
-  }).join('');
-
-  document.getElementById('summaryRows').innerHTML = rows;
-  document.getElementById('grandTotal').textContent = fmt(grand, base);
-  updateBudgetStatus();
-}
-
-function updateBudgetStatus() {
-  const base = baseCurrency();
-  const budgetVal = parseFloat(document.getElementById('budgetInput').value);
-  const grand = countries.reduce((s,c) =>
-    s + c.expenses.reduce((es,e) => es + convert(e.amount||0, c.currency, base), 0), 0);
-
-  const el = document.getElementById('budgetStatus');
-  if (!budgetVal || isNaN(budgetVal)) { el.style.display='none'; return; }
-  el.style.display = 'inline-block';
-  if (grand > budgetVal) {
-    el.className = 'budget-status over';
-    el.textContent = `⚠️ 予算オーバー ${fmt(grand - budgetVal, base)}`;
-  } else {
-    el.className = 'budget-status ok';
-    el.textContent = `✅ 残り ${fmt(budgetVal - grand, base)}`;
-  }
-}
-
-// ────────── COUNTRY NAME → FLAG ──────────
 const NAME_TO_EMOJI = {
-  // 日本語
-  'アメリカ':'🇺🇸','米国':'🇺🇸','usa':'🇺🇸','america':'🇺🇸','united states':'🇺🇸',
+  'アメリカ':'🇺🇸','米国':'🇺🇸','usa':'🇺🇸','america':'🇺🇸','united states':'🇺🇸','ハワイ':'🇺🇸',
   'イギリス':'🇬🇧','英国':'🇬🇧','uk':'🇬🇧','england':'🇬🇧','britain':'🇬🇧',
   'フランス':'🇫🇷','france':'🇫🇷',
   'ドイツ':'🇩🇪','germany':'🇩🇪',
@@ -772,8 +542,6 @@ const NAME_TO_EMOJI = {
   'インド':'🇮🇳','india':'🇮🇳',
   'スリランカ':'🇱🇰','sri lanka':'🇱🇰',
   'ネパール':'🇳🇵','nepal':'🇳🇵',
-  'パキスタン':'🇵🇰','pakistan':'🇵🇰',
-  'バングラデシュ':'🇧🇩','bangladesh':'🇧🇩',
   'UAE':'🇦🇪','ドバイ':'🇦🇪','dubai':'🇦🇪','uae':'🇦🇪',
   'サウジアラビア':'🇸🇦','saudi':'🇸🇦',
   'イスラエル':'🇮🇱','israel':'🇮🇱',
@@ -781,204 +549,661 @@ const NAME_TO_EMOJI = {
   'モロッコ':'🇲🇦','morocco':'🇲🇦',
   '南アフリカ':'🇿🇦','south africa':'🇿🇦',
   'ケニア':'🇰🇪','kenya':'🇰🇪',
-  'エチオピア':'🇪🇹','ethiopia':'🇪🇹',
   '日本':'🇯🇵','japan':'🇯🇵',
   'モナコ':'🇲🇨','monaco':'🇲🇨',
   'クロアチア':'🇭🇷','croatia':'🇭🇷',
   'アイスランド':'🇮🇸','iceland':'🇮🇸',
   'アイルランド':'🇮🇪','ireland':'🇮🇪',
-  'ルーマニア':'🇷🇴','romania':'🇷🇴',
-  'ブルガリア':'🇧🇬','bulgaria':'🇧🇬',
-  'スロバキア':'🇸🇰','slovakia':'🇸🇰',
-  'スロベニア':'🇸🇮','slovenia':'🇸🇮',
-  'セルビア':'🇷🇸','serbia':'🇷🇸',
-  'ウクライナ':'🇺🇦','ukraine':'🇺🇦',
-  'コロンビア':'🇨🇴','colombia':'🇨🇴',
-  'キューバ':'🇨🇺','cuba':'🇨🇺',
   'グアム':'🇬🇺','guam':'🇬🇺',
-  'ハワイ':'🇺🇸','hawaii':'🇺🇸',
 };
 
-function guessEmoji(name) {
-  const key = name.trim().toLowerCase();
-  if (!key) return null;
-  // 完全一致 or 部分一致
-  if (NAME_TO_EMOJI[key]) return NAME_TO_EMOJI[key];
-  for (const [k, v] of Object.entries(NAME_TO_EMOJI)) {
-    if (key.includes(k) || k.includes(key)) return v;
-  }
-  return null;
+const EMOJIS = ['🇯🇵','🇺🇸','🇬🇧','🇫🇷','🇩🇪','🇮🇹','🇪🇸','🇦🇺','🇨🇦','🇰🇷','🇨🇳','🇹🇼',
+  '🇹🇭','🇸🇬','🇭🇰','🇮🇩','🇲🇾','🇵🇭','🇻🇳','🇮🇳','🇳🇿','🇧🇷','🇲🇽','🇿🇦',
+  '🇸🇪','🇳🇴','🇩🇰','🇵🇱','🇨🇿','🇭🇺','🇨🇭','🇦🇪','🇸🇦','🇮🇱','🇹🇷'];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+const TRIPS_KEY      = 'travel_trips_v2';
+const RATE_CACHE_KEY = 'travel_rate_cache_v1';
+
+let trips         = [];   // 全旅行リスト
+let currentTripId = null; // 現在表示中の旅行ID
+let nextTripId    = 1;
+let liveRates     = {};   // 本日の為替レート（EUR base）
+let liveRateDate  = '';
+
+// ── 現在の旅行オブジェクトを返すヘルパー ──
+function currentTrip() { return trips.find(t => t.id === currentTripId) ?? null; }
+
+// ══════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════
+function saveAll() {
+  try {
+    localStorage.setItem(TRIPS_KEY, JSON.stringify({ trips, currentTripId, nextTripId }));
+  } catch(e) {}
 }
 
-// ────────── COUNTRY CRUD ──────────
-function addCountry() {
-  const preset = COUNTRY_PRESETS[countries.length % COUNTRY_PRESETS.length];
-  const c = {
-    id: nextId++,
-    name: preset.name,
-    currency: preset.currency,
-    emoji: preset.emoji,
-    expenses: [{ category:'hotel', desc:'', amount:'' }],
+function loadAll() {
+  try {
+    const raw = localStorage.getItem(TRIPS_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    trips         = s.trips      ?? [];
+    currentTripId = s.currentTripId ?? null;
+    nextTripId    = s.nextTripId ?? (trips.length + 1);
+    // currentTripId が存在する旅行か確認
+    if (currentTripId && !trips.find(t => t.id === currentTripId)) {
+      currentTripId = trips[0]?.id ?? null;
+    }
+    return trips.length > 0;
+  } catch(e) { return false; }
+}
+
+// 為替レートキャッシュ（日付をキーに保存）
+function getRateCache() {
+  try { return JSON.parse(localStorage.getItem(RATE_CACHE_KEY) ?? '{}'); } catch(e) { return {}; }
+}
+function setRateCache(date, rates) {
+  try {
+    const cache = getRateCache();
+    cache[date] = rates;
+    // 古いキャッシュは30件まで
+    const keys = Object.keys(cache);
+    if (keys.length > 30) delete cache[keys[0]];
+    localStorage.setItem(RATE_CACHE_KEY, JSON.stringify(cache));
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+//  TRIP CRUD
+// ══════════════════════════════════════════
+function makeTrip(name) {
+  const today = todayStr();
+  return {
+    id:         nextTripId++,
+    name:       name ?? `新しい旅行 ${trips.length + 1}`,
+    baseCurrency: 'JPY',
+    budget:     '',
+    countries:  [],
+    nextCountryId: 1,
+    createdAt:  today,
+    updatedAt:  today,
   };
-  countries.push(c);
-  renderAll();
 }
 
-function removeCountry(id) {
-  countries = countries.filter(c => c.id !== id);
-  renderAll();
+function createNewTrip() {
+  const trip = makeTrip();
+  trips.unshift(trip); // 先頭に追加
+  switchTrip(trip.id);
 }
 
-function updateCountry(id, key, val) {
-  const c = countries.find(c => c.id === id);
+function switchTrip(id) {
+  currentTripId = id;
+  const trip = currentTrip();
+  if (!trip) return;
+  // UI反映
+  document.getElementById('tripNameInput').value  = trip.name;
+  document.getElementById('baseCurrency').value   = trip.baseCurrency;
+  document.getElementById('budgetInput').value    = trip.budget ?? '';
+  renderAll();
+  updateSummary();
+  saveAll();
+}
+
+function deleteTrip(id) {
+  if (!confirm('この旅行を削除しますか？')) return;
+  trips = trips.filter(t => t.id !== id);
+  if (currentTripId === id) {
+    currentTripId = trips[0]?.id ?? null;
+  }
+  if (!currentTripId && trips.length > 0) currentTripId = trips[0].id;
+  saveAll();
+  renderTripList();
+  if (currentTripId) switchTrip(currentTripId);
+  else renderAll();
+}
+
+function onTripNameChange(val) {
+  const trip = currentTrip();
+  if (trip) { trip.name = val; trip.updatedAt = todayStr(); saveAll(); }
+}
+
+function onBaseCurrencyChange(val) {
+  const trip = currentTrip();
+  if (trip) { trip.baseCurrency = val; trip.updatedAt = todayStr(); saveAll(); }
+  recalcAll();
+}
+
+function onBudgetChange(val) {
+  const trip = currentTrip();
+  if (trip) { trip.budget = val; trip.updatedAt = todayStr(); saveAll(); }
+  updateBudgetStatus();
+}
+
+// ══════════════════════════════════════════
+//  LIVE RATE FETCH
+// ══════════════════════════════════════════
+const FALLBACK_RATES = {
+  EUR:1, USD:1.08, JPY:164, GBP:0.86, AUD:1.67, CAD:1.47,
+  CHF:0.97, HKD:8.43, SGD:1.46, KRW:1450, CNY:7.82, TWD:34.8,
+  THB:38.5, IDR:17200, MYR:5.06, PHP:60.5, VND:27200, INR:90.5,
+  TRY:35.0, MXN:19.5, BRL:5.65, ZAR:20.1, SEK:11.3, NOK:11.5,
+  DKK:7.46, NZD:1.79, AED:3.97, SAR:4.05, ILS:3.98, PLN:4.26,
+  CZK:25.0, HUF:392,
+};
+
+function fetchWithTimeout(url, ms) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, {signal: ctrl.signal}).finally(() => clearTimeout(tid));
+}
+
+async function fetchRatesForDate(dateStr) {
+  // キャッシュ確認
+  const cache = getRateCache();
+  if (cache[dateStr]) return cache[dateStr];
+
+  const isToday = (dateStr === todayStr() || dateStr === 'latest');
+  const apiDate = isToday ? 'latest' : dateStr;
+
+  const APIS = [
+    {
+      url: `https://api.frankfurter.app/${apiDate}`,
+      parse: (d) => ({ ...d.rates, EUR: 1 }),
+    },
+    {
+      url: `https://open.er-api.com/v6/latest/EUR`,
+      parse: (d) => d.rates,
+    },
+    {
+      url: `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${apiDate}/v1/currencies/eur.json`,
+      parse: (d) => Object.fromEntries(Object.entries(d.eur ?? {}).map(([k,v])=>[k.toUpperCase(),v])),
+    },
+  ];
+
+  for (const api of APIS) {
+    try {
+      const res = await fetchWithTimeout(api.url, 8000);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const r = api.parse(data);
+      if (!r || !r.JPY) throw new Error('JPYなし');
+      if (!r.EUR) r.EUR = 1;
+      setRateCache(dateStr, r);
+      return r;
+    } catch(e) {}
+  }
+  return null; // 失敗
+}
+
+async function fetchLiveRates() {
+  setLiveRateStatus('loading', '本日レート取得中…');
+  const btn = document.getElementById('refreshBtn');
+  btn.style.animation = 'spin 1s linear'; // simple spin
+  const r = await fetchRatesForDate('latest');
+  btn.style.animation = '';
+  if (r) {
+    liveRates     = r;
+    liveRateDate  = todayStr();
+    setLiveRateStatus('ok', `本日レート（${liveRateDate}）`);
+  } else {
+    liveRates = {...FALLBACK_RATES};
+    setLiveRateStatus('error', 'レート取得失敗 – 概算値');
+  }
+  recalcAll();
+}
+
+function setLiveRateStatus(state, text) {
+  document.getElementById('rateDot').className = 'rate-dot ' + state;
+  document.getElementById('rateStatusText').textContent = text;
+}
+
+// ══════════════════════════════════════════
+//  COUNTRY CRUD
+// ══════════════════════════════════════════
+function addCountry() {
+  const trip = currentTrip();
+  if (!trip) return;
+  const preset = COUNTRY_PRESETS[trip.countries.length % COUNTRY_PRESETS.length];
+  trip.countries.push({
+    id:           trip.nextCountryId++,
+    name:         preset.name,
+    currency:     preset.currency,
+    emoji:        preset.emoji,
+    expenses:     [{category:'hotel', desc:'', amount:''}],
+    rateLockDate: todayStr(), // デフォルトは今日
+    lockedRates:  null,       // まだ取得していない
+    rateLockStatus: 'pending',
+  });
+  trip.updatedAt = todayStr();
+  saveAll();
+  renderAll();
+  // 追加した国のレートを取得
+  const c = trip.countries[trip.countries.length - 1];
+  fetchAndLockRate(c);
+}
+
+function removeCountry(cid) {
+  const trip = currentTrip();
+  if (!trip) return;
+  trip.countries = trip.countries.filter(c => c.id !== cid);
+  trip.updatedAt = todayStr();
+  saveAll();
+  renderAll();
+  updateSummary();
+}
+
+function updateCountry(cid, key, val) {
+  const trip = currentTrip();
+  if (!trip) return;
+  const c = trip.countries.find(c => c.id === cid);
   if (!c) return;
   c[key] = val;
   if (key === 'name') {
     const matched = guessEmoji(val);
     if (matched) {
       c.emoji = matched;
-      const el = document.querySelector(`#card-${id} .country-emoji`);
+      const el = document.querySelector(`#card-${cid} .country-emoji`);
       if (el) el.textContent = matched;
     }
   }
-  if (key === 'currency') {
-    // update rate label
-    const base = baseCurrency();
-    const rateEl = document.getElementById('rate-' + id);
-    if (rateEl) {
-      rateEl.textContent = `1 ${val} = ${fmt(convert(1, val, base), base)} ${base}`;
-    }
-    // update header column
-    const headers = document.querySelectorAll(`#card-${id} .expense-table-header .col-header`);
-    if (headers[2]) headers[2].textContent = `金額（${val}）`;
-  }
-  recalcCard(id);
+  trip.updatedAt = todayStr();
+  saveAll();
+  if (key === 'currency') recalcCard(cid);
 }
 
-const EMOJIS = ['🇯🇵','🇺🇸','🇬🇧','🇫🇷','🇩🇪','🇮🇹','🇪🇸','🇦🇺','🇨🇦','🇰🇷','🇨🇳','🇹🇼',
-  '🇹🇭','🇸🇬','🇭🇰','🇮🇩','🇲🇾','🇵🇭','🇻🇳','🇮🇳','🇳🇿','🇧🇷','🇲🇽','🇿🇦',
-  '🇸🇪','🇳🇴','🇩🇰','🇵🇱','🇨🇿','🇭🇺','🇨🇭','🇦🇪','🇸🇦','🇮🇱','🇹🇷'];
-
-function changeEmoji(id) {
-  const c = countries.find(c => c.id === id);
+function changeEmoji(cid) {
+  const trip = currentTrip();
+  if (!trip) return;
+  const c = trip.countries.find(c => c.id === cid);
   if (!c) return;
   const cur = EMOJIS.indexOf(c.emoji);
   c.emoji = EMOJIS[(cur + 1) % EMOJIS.length];
-  const el = document.querySelector(`#card-${id} .country-emoji`);
+  const el = document.querySelector(`#card-${cid} .country-emoji`);
   if (el) el.textContent = c.emoji;
+  saveAll();
+}
+
+// ── レート日付変更 ──
+async function onRateDateChange(cid, dateStr) {
+  const trip = currentTrip();
+  if (!trip) return;
+  const c = trip.countries.find(c => c.id === cid);
+  if (!c) return;
+  c.rateLockDate   = dateStr;
+  c.lockedRates    = null;
+  c.rateLockStatus = 'loading';
+  saveAll();
+  updateRateBadge(c);
+  await fetchAndLockRate(c);
+}
+
+async function fetchAndLockRate(c) {
+  const cid = c.id;
+  setBadge(cid, 'loading', '取得中…');
+  const r = await fetchRatesForDate(c.rateLockDate);
+  const trip = currentTrip();
+  if (!trip) return;
+  const cc = trip.countries.find(x => x.id === cid);
+  if (!cc) return;
+  if (r) {
+    cc.lockedRates    = r;
+    cc.rateLockStatus = 'locked';
+  } else {
+    cc.rateLockStatus = 'error';
+  }
+  saveAll();
+  updateRateBadge(cc);
+  recalcCard(cid);
+}
+
+function updateRateBadge(c) {
+  const cid = c.id;
+  const base = baseCurrency();
+  const rates = getRatesFor(c);
+  const rate1 = rates ? convert(1, c.currency, base, rates) : null;
+  const rateText = rate1 != null ? `1 ${c.currency} = ${fmt(rate1, base)} ${base}` : '';
+
+  if (c.rateLockStatus === 'locked') {
+    setBadge(cid, 'locked', `📌 ${c.rateLockDate} 固定`);
+  } else if (c.rateLockStatus === 'loading') {
+    setBadge(cid, 'loading', '取得中…');
+  } else if (c.rateLockStatus === 'error') {
+    setBadge(cid, 'error', '取得失敗');
+  } else {
+    setBadge(cid, 'live', '本日レート');
+  }
+  const rateValEl = document.getElementById(`rate-val-${cid}`);
+  if (rateValEl) rateValEl.textContent = rateText;
+}
+
+function setBadge(cid, cls, text) {
+  const el = document.getElementById(`rate-badge-${cid}`);
+  if (el) { el.className = `rate-badge ${cls}`; el.textContent = text; }
+}
+
+// ── レートを返す（locked があればそちら、なければ live） ──
+function getRatesFor(c) {
+  if (c.lockedRates) return c.lockedRates;
+  return Object.keys(liveRates).length > 0 ? liveRates : FALLBACK_RATES;
+}
+
+// ══════════════════════════════════════════
+//  EXPENSE CRUD
+// ══════════════════════════════════════════
+function addExpense(cid) {
+  const trip = currentTrip();
+  if (!trip) return;
+  const c = trip.countries.find(c => c.id === cid);
+  if (!c) return;
+  c.expenses.push({category:'food', desc:'', amount:''});
+  trip.updatedAt = todayStr();
+  saveAll();
+  renderAll();
+}
+
+function removeExpense(cid, idx) {
+  const trip = currentTrip();
+  if (!trip) return;
+  const c = trip.countries.find(c => c.id === cid);
+  if (!c) return;
+  c.expenses.splice(idx, 1);
+  trip.updatedAt = todayStr();
+  saveAll();
+  renderAll();
+}
+
+function updateExpense(cid, idx, key, val) {
+  const trip = currentTrip();
+  if (!trip) return;
+  const c = trip.countries.find(c => c.id === cid);
+  if (!c || !c.expenses[idx]) return;
+  c.expenses[idx][key] = val;
+  trip.updatedAt = todayStr();
+  saveAll();
+  if (key === 'amount') recalcCard(cid);
+}
+
+// ══════════════════════════════════════════
+//  CONVERSION & FORMAT
+// ══════════════════════════════════════════
+function convert(amount, from, to, rates) {
+  if (from === to) return amount;
+  const f = rates[from] ?? 1;
+  const t = rates[to]   ?? 1;
+  return amount / f * t;
+}
+
+function baseCurrency() { return document.getElementById('baseCurrency').value; }
+
+function fmt(val, currency) {
+  const sym = CURRENCIES[currency]?.symbol ?? '';
+  if (!val && val !== 0) return `${sym}—`;
+  if (Math.abs(val) >= 1000000) return sym + (val/1000000).toFixed(2) + 'M';
+  if (Math.abs(val) >= 10000)  return sym + Math.round(val).toLocaleString();
+  return sym + val.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2});
+}
+
+function guessEmoji(name) {
+  const key = name.trim().toLowerCase();
+  if (!key) return null;
+  if (NAME_TO_EMOJI[key]) return NAME_TO_EMOJI[key];
+  for (const [k,v] of Object.entries(NAME_TO_EMOJI)) {
+    if (key.includes(k) || k.includes(key)) return v;
+  }
+  return null;
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+function buildCurrencyOptions(selected) {
+  return Object.entries(CURRENCIES).map(([code, info]) =>
+    `<option value="${code}" ${code===selected?'selected':''}>${info.flag} ${code} – ${info.name}</option>`
+  ).join('');
+}
+
+function renderAll() {
+  const trip = currentTrip();
+  const container = document.getElementById('countriesContainer');
+  const noDiv     = document.getElementById('noCountries');
+
+  if (!trip || trip.countries.length === 0) {
+    container.innerHTML = '';
+    noDiv.style.display = 'block';
+    document.getElementById('summaryPanel').style.display = 'none';
+    return;
+  }
+  noDiv.style.display = 'none';
+  container.innerHTML = trip.countries.map(c => renderCountryCard(c)).join('');
   updateSummary();
 }
 
-// ────────── EXPENSE CRUD ──────────
-function addExpense(countryId) {
-  const c = countries.find(c => c.id === countryId);
-  if (!c) return;
-  c.expenses.push({ category:'food', desc:'', amount:'' });
-  renderAll();
+function renderCountryCard(c) {
+  const base = baseCurrency();
+  const rates = getRatesFor(c);
+  const rate1 = rates ? convert(1, c.currency, base, rates) : null;
+  const rateText = rate1 != null ? `1 ${c.currency} = ${fmt(rate1, base)} ${base}` : '';
+
+  let badgeCls = 'live', badgeTxt = '本日レート';
+  if      (c.rateLockStatus === 'locked')  { badgeCls='locked';  badgeTxt=`📌 ${c.rateLockDate} 固定`; }
+  else if (c.rateLockStatus === 'loading') { badgeCls='loading'; badgeTxt='取得中…'; }
+  else if (c.rateLockStatus === 'error')   { badgeCls='error';   badgeTxt='取得失敗'; }
+
+  const rows = c.expenses.map((e, i) => {
+    const r = getRatesFor(c);
+    const converted = r ? convert(e.amount||0, c.currency, base, r) : 0;
+    return `
+    <div class="expense-row">
+      <select onchange="updateExpense(${c.id},${i},'category',this.value)">
+        ${CATEGORIES.map(cat=>`<option value="${cat.value}" ${cat.value===e.category?'selected':''}>${cat.label}</option>`).join('')}
+      </select>
+      <input type="text" placeholder="説明（例：ルーブル美術館）" value="${escHtml(e.desc)}"
+        oninput="updateExpense(${c.id},${i},'desc',this.value)">
+      <input class="col-amount" type="number" min="0" step="any" placeholder="金額"
+        value="${e.amount||''}" oninput="updateExpense(${c.id},${i},'amount',parseFloat(this.value)||0)">
+      <div class="converted-amount col-converted">${e.amount ? fmt(converted, base) : '—'}</div>
+      <button class="btn-del-row col-delete" onclick="removeExpense(${c.id},${i})">🗑</button>
+    </div>`;
+  }).join('');
+
+  const subtotal = c.expenses.reduce((s,e) => {
+    const r = getRatesFor(c);
+    return s + (r ? convert(e.amount||0, c.currency, base, r) : 0);
+  }, 0);
+
+  return `
+  <div class="country-card" id="card-${c.id}">
+    <div class="country-header">
+      <span class="country-emoji" onclick="changeEmoji(${c.id})" title="クリックで変更">${c.emoji}</span>
+      <input class="country-name-input" value="${escHtml(c.name)}" placeholder="国名"
+        oninput="updateCountry(${c.id},'name',this.value)">
+      <select class="currency-select" onchange="updateCountry(${c.id},'currency',this.value)">
+        ${buildCurrencyOptions(c.currency)}
+      </select>
+      <button class="btn-remove-country" onclick="removeCountry(${c.id})">✕</button>
+    </div>
+    <div class="rate-lock-row">
+      <span class="rate-lock-label">📅 レート基準日：</span>
+      <input type="date" class="rate-date-input" value="${c.rateLockDate}"
+        onchange="onRateDateChange(${c.id},this.value)">
+      <span class="rate-badge ${badgeCls}" id="rate-badge-${c.id}">${badgeTxt}</span>
+      <span class="rate-value" id="rate-val-${c.id}">${rateText}</span>
+    </div>
+    <div class="expense-table">
+      <div class="expense-table-header">
+        <span class="col-header">カテゴリ</span>
+        <span class="col-header">説明</span>
+        <span class="col-header">金額（${c.currency}）</span>
+        <span class="col-header">換算（${base}）</span>
+        <span></span>
+      </div>
+      ${rows}
+    </div>
+    <div class="country-footer">
+      <button class="btn-add-row" onclick="addExpense(${c.id})">＋ 費用を追加</button>
+      <div class="country-subtotal" id="subtotal-${c.id}"><span>小計</span>${fmt(subtotal, base)}</div>
+    </div>
+  </div>`;
 }
 
-function removeExpense(countryId, idx) {
-  const c = countries.find(c => c.id === countryId);
-  if (!c) return;
-  c.expenses.splice(idx, 1);
-  renderAll();
+function updateSummary() {
+  const trip = currentTrip();
+  if (!trip || trip.countries.length === 0) {
+    document.getElementById('summaryPanel').style.display = 'none';
+    return;
+  }
+  document.getElementById('summaryPanel').style.display = 'block';
+  const base = baseCurrency();
+  let grand = 0;
+  const rows = trip.countries.map(c => {
+    const r = getRatesFor(c);
+    const sub = c.expenses.reduce((s,e) => s + (r ? convert(e.amount||0, c.currency, base, r) : 0), 0);
+    grand += sub;
+    return `<div class="summary-row">
+      <span class="label">${c.emoji} ${c.name||'未設定'} <small style="opacity:.6;font-size:11px">（${c.rateLockDate}レート）</small></span>
+      <span class="amount">${fmt(sub, base)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('summaryRows').innerHTML = rows;
+  document.getElementById('grandTotal').textContent = fmt(grand, base);
+  updateBudgetStatus();
 }
 
-function updateExpense(countryId, idx, key, val) {
-  const c = countries.find(c => c.id === countryId);
-  if (!c || !c.expenses[idx]) return;
-  c.expenses[idx][key] = val;
-  if (key === 'amount') recalcCard(countryId);
+function updateBudgetStatus() {
+  const trip = currentTrip();
+  const base = baseCurrency();
+  const budgetVal = parseFloat(document.getElementById('budgetInput').value);
+  const grand = trip ? trip.countries.reduce((s,c) => {
+    const r = getRatesFor(c);
+    return s + c.expenses.reduce((es,e) => es + (r ? convert(e.amount||0, c.currency, base, r) : 0), 0);
+  }, 0) : 0;
+  const el = document.getElementById('budgetStatus');
+  if (!budgetVal || isNaN(budgetVal)) { el.style.display='none'; return; }
+  el.style.display = 'inline-block';
+  if (grand > budgetVal) {
+    el.className = 'budget-status over';
+    el.textContent = `⚠️ 予算オーバー ${fmt(grand-budgetVal, base)}`;
+  } else {
+    el.className = 'budget-status ok';
+    el.textContent = `✅ 残り ${fmt(budgetVal-grand, base)}`;
+  }
 }
 
-// ────────── RECALC ──────────
-function recalcCard(id) {
-  const c = countries.find(c => c.id === id);
+function recalcCard(cid) {
+  const trip = currentTrip();
+  if (!trip) return;
+  const c = trip.countries.find(c => c.id === cid);
   if (!c) return;
   const base = baseCurrency();
-  const subtotal = c.expenses.reduce((s,e) => s + convert(e.amount||0, c.currency, base), 0);
-  const subEl = document.getElementById('subtotal-' + id);
+  const r = getRatesFor(c);
+  const subtotal = c.expenses.reduce((s,e) => s + (r ? convert(e.amount||0, c.currency, base, r) : 0), 0);
+  const subEl = document.getElementById('subtotal-' + cid);
   if (subEl) subEl.innerHTML = `<span>小計</span>${fmt(subtotal, base)}`;
-
   c.expenses.forEach((e, i) => {
-    const converted = convert(e.amount||0, c.currency, base);
-    const el = document.querySelector(`#card-${id} .expense-row:nth-child(${i+1}) .converted-amount`);
+    const converted = r ? convert(e.amount||0, c.currency, base, r) : 0;
+    const el = document.querySelector(`#card-${cid} .expense-row:nth-child(${i+1}) .converted-amount`);
     if (el) el.textContent = e.amount ? fmt(converted, base) : '—';
   });
   updateSummary();
 }
 
 function recalcAll() {
-  countries.forEach(c => {
-    const base = baseCurrency();
-    const rateEl = document.getElementById('rate-' + c.id);
-    if (rateEl) {
-      rateEl.textContent = `1 ${c.currency} = ${fmt(convert(1, c.currency, base), base)} ${base}`;
-    }
-  });
-  renderAll();
+  const trip = currentTrip();
+  if (!trip) return;
+  trip.countries.forEach(c => { updateRateBadge(c); recalcCard(c.id); });
 }
 
-// ────────── UTILS ──────────
+// ══════════════════════════════════════════
+//  TRIP LIST MODAL
+// ══════════════════════════════════════════
+function openModal() { renderTripList(); document.getElementById('tripsModal').classList.remove('hidden'); }
+function closeModal(){ document.getElementById('tripsModal').classList.add('hidden'); }
+function onModalOverlayClick(e) { if (e.target === document.getElementById('tripsModal')) closeModal(); }
+
+function renderTripList() {
+  const base = baseCurrency();
+  const container = document.getElementById('tripList');
+  if (trips.length === 0) {
+    container.innerHTML = '<div class="trip-empty">まだ旅行が保存されていません</div>';
+    return;
+  }
+  container.innerHTML = trips.map(trip => {
+    const grand = trip.countries.reduce((s,c) => {
+      const r = c.lockedRates ?? liveRates ?? FALLBACK_RATES;
+      const bc = trip.baseCurrency ?? 'JPY';
+      return s + c.expenses.reduce((es,e) => es + convert(e.amount||0, c.currency, bc, r), 0);
+    }, 0);
+    const isActive = trip.id === currentTripId;
+    const countryEmojis = trip.countries.map(c=>c.emoji).slice(0,4).join('');
+    return `
+    <div class="trip-item ${isActive?'active':''}" onclick="switchTrip(${trip.id}); closeModal();">
+      <div class="trip-item-icon">${countryEmojis || '✈️'}</div>
+      <div class="trip-item-info">
+        <div class="trip-item-name">${escHtml(trip.name)}</div>
+        <div class="trip-item-meta">${trip.countries.length}ヶ国 ・ 作成：${trip.createdAt}</div>
+      </div>
+      <div class="trip-item-total">${fmt(grand, trip.baseCurrency ?? 'JPY')}</div>
+      <button class="btn-del-trip" onclick="event.stopPropagation(); deleteTrip(${trip.id})">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
 function escHtml(s) {
   return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ────────── LOCALSTORAGE ──────────
-const STORAGE_KEY = 'travel_expense_v1';
-
-function saveState() {
-  try {
-    const state = {
-      countries,
-      nextId,
-      tripName: document.getElementById('tripName').value,
-      baseCurrency: document.getElementById('baseCurrency').value,
-      budget: document.getElementById('budgetInput').value,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch(e) {}
-}
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return false;
-    const state = JSON.parse(raw);
-    countries = state.countries ?? [];
-    nextId = state.nextId ?? (countries.length + 1);
-    if (state.tripName) document.getElementById('tripName').value = state.tripName;
-    if (state.baseCurrency) document.getElementById('baseCurrency').value = state.baseCurrency;
-    if (state.budget) document.getElementById('budgetInput').value = state.budget;
-    return countries.length > 0;
-  } catch(e) {
-    return false;
-  }
-}
-
-// 保存トリガー：入力のたびに自動保存
-document.addEventListener('input', () => saveState());
-document.addEventListener('change', () => saveState());
-
-// ────────── INIT ──────────
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
 (async function init() {
-  const restored = loadState();
-  if (!restored) {
-    countries.push({ id:nextId++, name:'アメリカ', currency:'USD', emoji:'🇺🇸',
-      expenses:[
-        { category:'flight', desc:'往復航空券', amount:'' },
-        { category:'hotel', desc:'ホテル（1泊）', amount:'' },
-      ]
-    });
-    countries.push({ id:nextId++, name:'フランス', currency:'EUR', emoji:'🇫🇷',
-      expenses:[
-        { category:'hotel', desc:'ホテル（1泊）', amount:'' },
-        { category:'entrance', desc:'ルーブル美術館', amount:'' },
-      ]
-    });
+  const restored = loadAll();
+
+  if (!restored || trips.length === 0) {
+    // 初回：サンプル旅行を作成
+    const sample = makeTrip('ヨーロッパ旅行 2025夏');
+    sample.countries.push(
+      { id:1, name:'フランス', currency:'EUR', emoji:'🇫🇷',
+        expenses:[{category:'hotel',desc:'ホテル（3泊）',amount:''},{category:'entrance',desc:'ルーブル美術館',amount:''}],
+        rateLockDate:todayStr(), lockedRates:null, rateLockStatus:'pending' },
+      { id:2, name:'イタリア', currency:'EUR', emoji:'🇮🇹',
+        expenses:[{category:'flight',desc:'パリ→ローマ',amount:''},{category:'food',desc:'食事代',amount:''}],
+        rateLockDate:todayStr(), lockedRates:null, rateLockStatus:'pending' },
+    );
+    sample.nextCountryId = 3;
+    trips = [sample];
+    currentTripId = sample.id;
+    saveAll();
   }
+
+  // UI初期化
+  const trip = currentTrip();
+  if (trip) {
+    document.getElementById('tripNameInput').value = trip.name;
+    document.getElementById('baseCurrency').value  = trip.baseCurrency ?? 'JPY';
+    document.getElementById('budgetInput').value   = trip.budget ?? '';
+  }
+
   renderAll();
-  await fetchRates();
+
+  // 本日の生レート取得
+  await fetchLiveRates();
+
+  // 各国のロック済みレートがなければ取得
+  if (trip) {
+    for (const c of trip.countries) {
+      if (!c.lockedRates) await fetchAndLockRate(c);
+    }
+  }
 })();
 </script>
 </body>
